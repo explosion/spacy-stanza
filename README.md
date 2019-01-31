@@ -30,7 +30,7 @@ pip install spacy_stanfordnlp
 ```
 
 Make sure to also install one of the
-[pre-trained StanfordNLP models](https://stanfordnlp.github.io/stanfordnlp/installation_download.html).
+[pre-trained StanfordNLP models](https://stanfordnlp.github.io/stanfordnlp/installation_download.html). It's recommended to run StanfordNLP on Python 3.6.8+ or Python 3.7.2+.
 
 ## 📖 Usage & Examples
 
