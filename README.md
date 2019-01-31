@@ -15,7 +15,7 @@ nlp = StanfordNLPLanguage(snlp)
 
 doc = nlp("Barack Obama was born in Hawaii. He was elected president in 2008.")
 for token in doc:
-    print(token.text, token.lemma_, token.pos_, token.dep_, token.is_sent_start)
+    print(token.text, token.lemma_, token.pos_, token.dep_)
 
 # Access spaCy's lexical attributes and syntax iterators
 print([token.is_stop for token in doc])
