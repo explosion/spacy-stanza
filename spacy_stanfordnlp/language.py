@@ -60,12 +60,10 @@ def get_tokens_with_heads(snlp_doc):
     for sentence in snlp_doc.sentences:
         for token in sentence.tokens:
             for word in token.words:
-                # TODO: fix heads – this works except for the first token?
-                head = (
-                    word.governor + offset - len(tokens)
-                    if word.governor is not None
-                    else 0
-                )
+                # Here, we're calculating the absolute token index in the doc,
+                # then the *relative* index of the head, -1 for zero-indexed
+                # and if the governor is 0 (root), we leave it at 0
+                head = word.governor + offset - len(tokens) - 1 if word.governor else 0
                 heads.append(head)
                 tokens.append(word)
         offset += sum(len(token.words) for token in sentence.tokens)
