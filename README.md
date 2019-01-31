@@ -55,9 +55,9 @@ If language data for the given language is available in spaCy, the respective
 language class will be used as the base for the `nlp` object – for example,
 `English()`. This lets you use spaCy's lexical attributes like `is_stop` or
 `like_num`. The `nlp` object follows the same API as any other spaCy `Language`
-class – so you can visualize it with displaCy, add custom components to it, use
-the rule-based matcher and do pretty much anything else you'd normally do in
-spaCy.
+class – so you can visualize the `Doc` objects with displaCy, add custom
+components to the pipeline, use the rule-based matcher and do pretty much
+anything else you'd normally do in spaCy.
 
 ```python
 # Access spaCy's lexical attributes
@@ -86,7 +86,8 @@ np_array = doc.to_array(['ORTH', 'LEMMA', 'POS'])
 ### Experimental: Mixing and matching pipeline components
 
 By default, the `nlp` object's pipeline will be empty, because all attributes
-are computed once and set in the tokenizer. But since it's a regular `nlp`
+are computed once and set in the custom
+[`Tokenizer`](spacy_stanfordnlp/language.py). But since it's a regular `nlp`
 object, you can add your own components to the pipeline.
 
 For example, the entity recognizer from one of spaCy's pre-trained models:
