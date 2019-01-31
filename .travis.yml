@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.6"
+before_script:
+  - pip install -r requirements.txt
+  - wget -O http://nlp.stanford.edu/software/conll_2018/en_ewt_models.zip ./models/en_ewt_models.zip
+script:
+  - python -m pytest test.py
+  - python setup.py sdist
+cache: pip
+notifications:
+  email: false

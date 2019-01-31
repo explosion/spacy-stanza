@@ -6,7 +6,7 @@ import pytest
 
 @pytest.fixture
 def models_dir():
-    return "./tmp/models"
+    return "./models"
 
 
 @pytest.fixture
