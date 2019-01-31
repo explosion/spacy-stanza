@@ -1,5 +1,7 @@
 # coding: utf8
-from spacy_stanfordnlp import StanfordNLPLanguage
+from spacy_stanfordnlp.language import StanfordNLPLanguage, get_defaults
+from spacy.lang.en import EnglishDefaults
+from spacy.language import BaseDefaults
 import stanfordnlp
 import pytest
 
@@ -40,3 +42,8 @@ def test_spacy_stanfordnlp(lang, models_dir):
     assert [t.pos_ for t in docs[0]] == ["INTJ", "NOUN"]
     assert docs[1].text == "This is a test"
     assert [t.pos_ for t in docs[1]] == ["DET", "VERB", "DET", "NOUN"]
+
+
+def test_get_defaults():
+    assert get_defaults("en") == EnglishDefaults
+    assert get_defaults("xvkfokdfo") == BaseDefaults
