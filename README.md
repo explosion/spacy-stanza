@@ -2,7 +2,11 @@
 
 # spaCy + StanfordNLP
 
-This package wraps the [StanfordNLP](https://github.com/stanfordnlp/stanfordnlp) library, so you can use Stanford's models as a [spaCy](https://spacy.io) pipeline. The Stanford models achieved top accuracy in the CoNLL 2017 and 2018 shared task, which involves tokenization, part-of-speech tagging, morphological analysis, lemmatization and labelled dependency parsing in 58 languages.
+This package wraps the [StanfordNLP](https://github.com/stanfordnlp/stanfordnlp)
+library, so you can use Stanford's models as a [spaCy](https://spacy.io)
+pipeline. The Stanford models achieved top accuracy in the CoNLL 2017 and 2018
+shared task, which involves tokenization, part-of-speech tagging, morphological
+analysis, lemmatization and labelled dependency parsing in 58 languages.
 
 [![Travis](https://img.shields.io/travis/explosion/spacy_stanfordnlp/master.svg?style=flat-square&logo=travis)](https://travis-ci.org/explosion/spacy_stanfordnlp)
 [![Appveyor](https://img.shields.io/appveyor/ci/explosion/spacy_stanfordnlp/master.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/explosion/spacy_stanfordnlp)
@@ -10,13 +14,16 @@ This package wraps the [StanfordNLP](https://github.com/stanfordnlp/stanfordnlp)
 [![GitHub](https://img.shields.io/github/release/explosion/spacy_stanfordnlp/all.svg?style=flat-square)](https://github.com/explosion/spacy_stanfordnlp)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/ambv/black)
 
+Using this wrapper, you'll be able to use the following annotations, computed by
+your pretrained `stanfordnlp` model:
+
 - Statistical tokenization (reflected in the `Doc` and its tokens)
 - Lemmatization (`token.lemma` and `token.lemma_`)
 - Part-of-speech tagging (`token.tag`, `token.tag_`, `token.pos`, `token.pos_`)
 - Dependency parsing (`token.dep`, `token.dep_`, `token.head`)
 - Sentence segmentation (`doc.sents`)
 
-## Installation
+## ️️️⌛️ Installation
 
 ```bash
 pip install spacy_stanfordnlp
@@ -25,7 +32,7 @@ pip install spacy_stanfordnlp
 Make sure to also install one of the
 [pre-trained StanfordNLP models](https://stanfordnlp.github.io/stanfordnlp/installation_download.html).
 
-## Usage & Examples
+## 📖 Usage & Examples
 
 The `StanfordNLPLanguage` class can be initialized with a loaded StanfordNLP
 pipeline and returns a spaCy [`Language` object](https://spacy.io/api/language),
