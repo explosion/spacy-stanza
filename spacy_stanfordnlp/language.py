@@ -1,3 +1,4 @@
+# coding: utf8
 from spacy.symbols import POS, TAG, DEP, LEMMA, HEAD
 from spacy.language import Language
 from spacy.tokens import Doc
