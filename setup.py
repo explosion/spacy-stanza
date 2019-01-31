@@ -32,7 +32,7 @@ def setup_package():
         version=about["__version__"],
         license=about["__license__"],
         packages=find_packages(),
-        install_requires=["spacy-nightly>=2.1.0a5", "stanfordnlp>=0.1.0,<0.2.0"],
+        install_requires=["spacy>=2.0.18", "stanfordnlp>=0.1.0,<0.2.0"],
         python_requires=">=3.6",
         entry_points={
             "spacy_languages": [
