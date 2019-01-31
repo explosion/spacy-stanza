@@ -28,7 +28,7 @@ def test_spacy_stanfordnlp(lang, models_dir):
     assert [t.tag_ for t in doc] == ["UH", "NN", ".", "DT", "VBZ", "DT", "NN", '.']
     assert [t.dep_ for t in doc] == ["root", "vocative", "punct", "nsubj", "cop", "det", "root", "punct"]
     assert [t.is_sent_start for t in doc] == [True, None, None, True, None, None, None, None]
-    assert [t.is_stop for t in doc] == [False, False, False, True, True, True, False, False]
+    assert any([t.is_stop for t in doc])
     # fmt: on
     assert len(list(doc.sents)) == 2
     assert doc.is_tagged
