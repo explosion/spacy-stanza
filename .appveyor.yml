@@ -6,6 +6,6 @@ install:
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
   - "wget -O http://nlp.stanford.edu/software/conll_2018/en_ewt_models.zip ./models/en_ewt_models.zip"
 test_script:
-  - "%PYTHON%\\python.exe -m pytest test.py"
+  - "%PYTHON%\\python.exe -m pytest tests"
 after_test:
   - "%PYTHON%\\python.exe setup.py sdist"
