@@ -33,6 +33,11 @@ def setup_package():
         license=about["__license__"],
         packages=find_packages(),
         install_requires=["spacy-nightly>=2.1.0a5", "stanfordnlp>=0.1.0,<0.2.0"],
+        entry_points={
+            "spacy_languages": [
+                "stanfordnlp_en = spacy_stanfordnlp:StanfordNLPLanguage"
+            ]
+        },
         zip_safe=False,
     )
 
