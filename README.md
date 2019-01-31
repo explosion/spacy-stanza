@@ -19,14 +19,9 @@ This package...
 ## Installation
 
 ```bash
+pip install spacy  # or spacy-nightly
+pip install stanfordnlp
 pip install spacy_stanfordnlp
-```
-
-To use the latest `spacy-nightly`, run the following afterwards:
-
-```bash
-pip uninstall spacy
-pip install spacy-nightly
 ```
 
 Make sure to also install one of the
