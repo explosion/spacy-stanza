@@ -58,7 +58,7 @@ def get_defaults(lang):
 class Tokenizer(object):
     """Because we're only running the StanfordNLP pipeline once and don't split
     it up into spaCy pipeline components, we'll set all the attributes within
-    a custom serializable tokenizer. The tokenizer is currently expected to
+    a custom tokenizer. The tokenizer is currently expected to
     implement serialization methods so we're mocking them up here. When loading
     the serialized nlp object back in, you can pass the `snlp` to spacy.load:
 
