@@ -4,12 +4,13 @@
 
 This package...
 
-Tokenization, sentence segmentation
+Tokenization, sentence segmentation, lemmatization, part-of-speech tagging and dependency parsing
 
 ## Usage
 
 The `StanfordNLPLanguage` class can be initialized with a loaded StanfordNLP
-pipeline and returns a spaCy `Language` object, i.e. the `nlp` object.
+pipeline and returns a spaCy [`Language` object](https://spacy.io/api/language),
+i.e. the `nlp` object you can use to process text.
 
 ```python
 import stanfordnlp
