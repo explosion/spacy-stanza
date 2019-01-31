@@ -2,7 +2,7 @@
 
 # spaCy + StanfordNLP
 
-This package...
+This package wraps the [StanfordNLP](https://github.com/stanfordnlp/stanfordnlp) library, so you can use Stanford's models as a [spaCy](https://spacy.io) pipeline. The Stanford models achieved top accuracy in the CoNLL 2017 and 2018 shared task, which involves tokenization, part-of-speech tagging, morphological analysis, lemmatization and labelled dependency parsing in 58 languages.
 
 [![Travis](https://img.shields.io/travis/explosion/spacy_stanfordnlp/master.svg?style=flat-square&logo=travis)](https://travis-ci.org/explosion/spacy_stanfordnlp)
 [![Appveyor](https://img.shields.io/appveyor/ci/explosion/spacy_stanfordnlp/master.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/explosion/spacy_stanfordnlp)
