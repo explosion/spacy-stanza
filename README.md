@@ -83,6 +83,36 @@ nlp.add_pipe(custom_component)
 np_array = doc.to_array(['ORTH', 'LEMMA', 'POS'])
 ```
 
+### Experimental: Mixing and matching pipeline components
+
+By default, the `nlp` object's pipeline will be empty, because all attributes
+are computed once and set in the tokenizer. But since it's a regular `nlp`
+object, you can add your own components to the pipeline.
+
+For example, the entity recognizer from one of spaCy's pre-trained models:
+
+```python
+import spacy
+import spacy_stanfordnlp
+import stanfordnlp
+
+snlp = stanfordnlp.Pipeline(lang="en", models_dir="./models")
+nlp = StanfordNLPLanguage(snlp)
+
+# Load spaCy's pre-trained en_core_web_sm model, get the entity recognizer and
+# add it to the StanfordNLP model's pipeline
+spacy_model = spacy.load("en_core_web_sm")
+ner = spacy_model.get_pipe("ner")
+nlp.add_pipe(ner)
+
+doc = nlp("Barack Obama was born in Hawaii. He was elected president in 2008.")
+print([(ent.text, ent.label_) for ent in doc.ents])
+# [('Barack Obama', 'PERSON'), ('Hawaii', 'GPE'), ('2008', 'DATE')]
+```
+
+You could also add and train
+[your own custom text classification component](https://spacy.io/usage/training#textcat).
+
 ### Advanced: serialization and entry points
 
 > ⚠️ **Important note:** This feature requires spaCy v.2.1.x, currently
