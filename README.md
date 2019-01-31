@@ -4,7 +4,12 @@
 
 This package...
 
+Tokenization, sentence segmentation
+
 ## Usage
+
+The `StanfordNLPLanguage` class can be initialized with a loaded StanfordNLP
+pipeline and returns a spaCy `Language` object, i.e. the `nlp` object.
 
 ```python
 import stanfordnlp
@@ -17,9 +22,9 @@ doc = nlp("Barack Obama was born in Hawaii. He was elected president in 2008.")
 for token in doc:
     print(token.text, token.lemma_, token.pos_, token.dep_)
 
-# Access spaCy's lexical attributes and syntax iterators
+# Access spaCy's lexical attributes
 print([token.is_stop for token in doc])
-print(doc.noun_chunks)
+print([token.like_num for token in doc])
 
 # Visualize dependencies
 from spacy import displacy
