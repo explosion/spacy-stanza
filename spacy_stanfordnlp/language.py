@@ -81,8 +81,6 @@ def get_doc(snlp_doc, vocab):
     """
     text = snlp_doc.text
     tokens, heads = get_tokens_with_heads(snlp_doc)
-    print([t.governor for t in tokens])
-    print(heads)
     if not len(tokens):
         raise ValueError("No tokens available")
     words = []
