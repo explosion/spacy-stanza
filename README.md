@@ -19,8 +19,6 @@ This package...
 ## Installation
 
 ```bash
-pip install spacy  # or spacy-nightly
-pip install stanfordnlp
 pip install spacy_stanfordnlp
 ```
 
@@ -110,10 +108,6 @@ You could also add and train
 [your own custom text classification component](https://spacy.io/usage/training#textcat).
 
 ### Advanced: serialization and entry points
-
-> ⚠️ **Important note:** This feature requires spaCy v.2.1.x, currently
-> available as `spacy-nightly`. To use this component with the nightly version,
-> uninstall `spacy` and then re-install `spacy-nightly`.
 
 The spaCy `nlp` object created by `StanfordNLPLanguage` exposes its language as
 `stanfordnlp_xx`.
