@@ -41,7 +41,7 @@ class StanfordNLPLanguage(Language):
 
 def get_defaults(lang):
     """Get the language-specific defaults, if available in spaCy. This allows
-    using lexical attribute getters that depend in static language data, e.g.
+    using lexical attribute getters that depend on static language data, e.g.
     Token.like_num, Token.is_stop, Doc.noun_chunks etc.
 
     lang (unicode): The language code.
