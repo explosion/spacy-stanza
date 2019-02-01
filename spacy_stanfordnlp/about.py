@@ -1,6 +1,6 @@
-__title__ = "spacy_stanfordnlp"
+__title__ = "spacy-stanfordnlp"
 __version__ = "0.0.1"
-__summary__ = "spaCy wrapper to turn StanfordNLP nlp objects into spaCy nlp objects"
+__summary__ = "Use the latest StanfordNLP research models directly in spaCy"
 __uri__ = "https://explosion.ai"
 __author__ = "Ines Montani"
 __email__ = "ines@explosion.ai"
