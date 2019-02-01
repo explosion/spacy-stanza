@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 
 def setup_package():
-    package_name = "spacy-stanfordnlp"
+    package_name = "spacy_stanfordnlp"
     root = os.path.abspath(os.path.dirname(__file__))
 
     # Read in package meta from about.py
@@ -22,7 +22,7 @@ def setup_package():
         readme = f.read()
 
     setup(
-        name=package_name,
+        name=about["__title__"],
         description=about["__summary__"],
         long_description=readme,
         long_description_content_type="text/markdown",
