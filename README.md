@@ -8,7 +8,6 @@ pipeline. The Stanford models achieved top accuracy in the CoNLL 2017 and 2018
 shared task, which involves tokenization, part-of-speech tagging, morphological
 analysis, lemmatization and labelled dependency parsing in 58 languages.
 
-[![Travis](https://img.shields.io/travis/explosion/spacy-stanfordnlp/master.svg?style=flat-square&logo=travis)](https://travis-ci.org/explosion/spacy-stanfordnlp)
 [![PyPi](https://img.shields.io/pypi/v/spacy-stanfordnlp.svg?style=flat-square)](https://pypi.python.org/pypi/spacy-stanfordnlp)
 [![GitHub](https://img.shields.io/github/release/explosion/spacy-stanfordnlp/all.svg?style=flat-square)](https://github.com/explosion/spacy-stanfordnlp)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/ambv/black)
