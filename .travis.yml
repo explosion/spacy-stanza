@@ -2,7 +2,8 @@ language: python
 python:
   - "3.6"
 before_script:
-  - pip install -r requirements.txt > /dev/null
+  - pip install -U pip
+  - pip install -r requirements.txt --progress-bar off
   - wget --quiet -O http://nlp.stanford.edu/software/conll_2018/en_ewt_models.zip ./models/en_ewt_models.zip
 script:
   - python -m pytest tests
