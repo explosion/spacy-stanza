@@ -7,6 +7,7 @@ install:
   - pip install -r requirements.txt --progress-bar off
   - mkdir -p ./models
   - wget --quiet http://nlp.stanford.edu/software/conll_2018/en_ewt_models.zip -O ./models/en_ewt_models.zip
+  - unzip ./models/en_ewt_models.zip
 script:
   - python -m pytest tests
   - python setup.py sdist
