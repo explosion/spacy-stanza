@@ -2,7 +2,6 @@
 from spacy.symbols import POS, TAG, DEP, LEMMA, HEAD
 from spacy.language import Language
 from spacy.tokens import Doc
-from spacy.vocab import Vocab
 from spacy.util import get_lang_class
 import numpy
 
