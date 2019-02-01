@@ -60,7 +60,7 @@ class Tokenizer(object):
     it up into spaCy pipeline components, we'll set all the attributes within
     a custom tokenizer. The tokenizer is currently expected to
     implement serialization methods so we're mocking them up here. When loading
-    the serialized nlp object back in, you can pass the `snlp` to spacy.load:
+    the serialized nlp object back in, you can pass `snlp` to spacy.load:
 
     >>> nlp.to_disk('/path/to/model')
     >>> nlp = spacy.load('/path/to/model', snlp=snlp)
