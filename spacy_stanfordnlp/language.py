@@ -119,9 +119,11 @@ class Tokenizer(object):
             else:
                 next_token = tokens[i + 1]
                 spaces.append(not span.startswith(next_token.text))
-        attrs = [POS, TAG, DEP, HEAD, LEMMA]
-        array = numpy.array(list(zip(pos, tags, deps, heads, lemmas)), dtype="uint64")
+        attrs = [POS, TAG, DEP, HEAD]
+        array = numpy.array(list(zip(pos, tags, deps, heads)), dtype="uint64")
         doc = Doc(self.vocab, words=words, spaces=spaces).from_array(attrs, array)
+        # Overwrite lemmas separately to prevent them from being overwritten by spaCy
+        doc.from_array([LEMMA], numpy.array([[lemma] for lemma in lemmas], dtype="uint64"))
         if any(pos) and any(tags):
             doc.is_tagged = True
         if any(deps):
