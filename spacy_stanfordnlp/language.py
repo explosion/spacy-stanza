@@ -123,7 +123,8 @@ class Tokenizer(object):
         array = numpy.array(list(zip(pos, tags, deps, heads)), dtype="uint64")
         doc = Doc(self.vocab, words=words, spaces=spaces).from_array(attrs, array)
         # Overwrite lemmas separately to prevent them from being overwritten by spaCy
-        doc.from_array([LEMMA], numpy.array([[lemma] for lemma in lemmas], dtype="uint64"))
+        lemma_array = numpy.array([[lemma] for lemma in lemmas], dtype="uint64")
+        doc.from_array([LEMMA], lemma_array)
         if any(pos) and any(tags):
             doc.is_tagged = True
         if any(deps):
