@@ -4,6 +4,7 @@ from spacy.language import Language
 from spacy.tokens import Doc
 from spacy.util import get_lang_class
 import numpy
+import re
 
 
 class StanfordNLPLanguage(Language):
@@ -69,6 +70,7 @@ class Tokenizer(object):
     from_disk = lambda self, *args, **kwargs: None
     to_bytes = lambda self, *args, **kwargs: None
     from_bytes = lambda self, *args, **kwargs: None
+    _ws_pattern = re.compile(r"\s+")
 
     def __init__(self, snlp, vocab):
         """Initialize the tokenizer.
@@ -98,11 +100,12 @@ class Tokenizer(object):
         deps = []
         lemmas = []
         offset = 0
+        is_aligned = self.check_aligned(text, tokens)
         for i, token in enumerate(tokens):
             span = text[offset:]
             if not len(span):
                 break
-            while not span.startswith(token.text):
+            while len(span) and span[0].isspace():
                 # If we encounter leading whitespace, skip one character ahead
                 offset += 1
                 span = text[offset:]
@@ -116,6 +119,8 @@ class Tokenizer(object):
             span = text[offset:]
             if i == len(tokens) - 1:
                 spaces.append(False)
+            elif not is_aligned:
+                spaces.append(True)
             else:
                 next_token = tokens[i + 1]
                 spaces.append(not span.startswith(next_token.text))
@@ -155,3 +160,7 @@ class Tokenizer(object):
                     tokens.append(word)
             offset += sum(len(token.words) for token in sentence.tokens)
         return tokens, heads
+
+    def check_aligned(self, text, tokens):
+        token_texts = "".join(t.text for t in tokens)
+        return re.sub(self._ws_pattern, "", text) == token_texts
