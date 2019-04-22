@@ -3,6 +3,9 @@ from spacy.symbols import POS, TAG, DEP, LEMMA, HEAD
 from spacy.language import Language
 from spacy.tokens import Doc
 from spacy.util import get_lang_class
+
+from stanfordnlp.models.common.vocab import UNK_ID
+
 import numpy
 import re
 
@@ -22,6 +25,8 @@ class StanfordNLPLanguage(Language):
         RETURNS (spacy.language.Language): The nlp object.
         """
         lang = snlp.config["lang"]
+        self.snlp = snlp
+        self.svecs = snlp.processors['pos'].pretrain
         self.lang = "stanfordnlp_" + lang
         self.Defaults = get_defaults(lang)
         self.vocab = self.Defaults.create_vocab()
@@ -37,7 +42,20 @@ class StanfordNLPLanguage(Language):
         self._optimizer = None
 
     def make_doc(self, text):
-        return self.tokenizer(text)
+        doc = self.tokenizer(text)
+        doc.user_token_hooks["vector"] = self.token_vector
+        doc.user_token_hooks["has_vector"] = self.token_has_vector
+        return doc
+
+    def token_vector(self, token):
+        """Returns a 0-vector (origin) when the token doesn't exist in snlp's pretrained embeddings."""
+        unit_id = self.svecs.vocab.unit2id(token.text)
+        return self.svecs.emb[unit_id]
+
+    def token_has_vector(self, token):
+        """Check if the token exists as a unit in snlp's pretrained embeddings."""
+        return self.svecs.vocab.unit2id(token.text) != UNK_ID
+
 
 
 def get_defaults(lang):
@@ -134,6 +152,7 @@ class Tokenizer(object):
             doc.is_tagged = True
         if any(deps):
             doc.is_parsed = True
+
         return doc
 
     def get_tokens_with_heads(self, snlp_doc):
