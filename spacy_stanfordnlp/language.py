@@ -57,7 +57,6 @@ class StanfordNLPLanguage(Language):
         return self.svecs.vocab.unit2id(token.text) != UNK_ID
 
 
-
 def get_defaults(lang):
     """Get the language-specific defaults, if available in spaCy. This allows
     using lexical attribute getters that depend on static language data, e.g.
@@ -152,7 +151,6 @@ class Tokenizer(object):
             doc.is_tagged = True
         if any(deps):
             doc.is_parsed = True
-
         return doc
 
     def get_tokens_with_heads(self, snlp_doc):
