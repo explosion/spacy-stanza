@@ -5,6 +5,7 @@ from spacy.tokens import Doc
 from spacy.util import get_lang_class
 
 from stanfordnlp.models.common.vocab import UNK_ID
+from stanfordnlp.models.common.pretrain import Pretrain
 
 import numpy
 import re
@@ -26,7 +27,7 @@ class StanfordNLPLanguage(Language):
         """
         lang = snlp.config["lang"]
         self.snlp = snlp
-        self.svecs = snlp.processors['pos'].pretrain
+        self.svecs = StanfordNLPLanguage._find_embeddings(snlp)
         self.lang = "stanfordnlp_" + lang
         self.Defaults = get_defaults(lang)
         self.vocab = self.Defaults.create_vocab()
@@ -41,14 +42,38 @@ class StanfordNLPLanguage(Language):
         self._path = None
         self._optimizer = None
 
+    @staticmethod
+    def _find_embeddings(snlp):
+        """Find pretrained word embeddings in any of a SNLP's processors.
+
+        RETURNS (Pretrain): Or None if no embeddings were found.
+        """
+        embs = None
+        for proc in snlp.processors.values():
+            if hasattr(proc, "pretrain") and isinstance(proc.pretrain, Pretrain):
+                embs = proc.pretrain
+                break
+        return embs
+
     def make_doc(self, text):
+        """Execute StanfordNLP pipeline on text and extract attributes into Spacy Doc.
+        If the StanfordNLP pipeline contains a processor with pretrained word embeddings
+        these will be mapped to token vectors.
+        """
         doc = self.tokenizer(text)
-        doc.user_token_hooks["vector"] = self.token_vector
-        doc.user_token_hooks["has_vector"] = self.token_has_vector
+        if self.svecs is not None:
+            doc.user_token_hooks["vector"] = self.token_vector
+            doc.user_token_hooks["has_vector"] = self.token_has_vector
         return doc
 
     def token_vector(self, token):
-        """Returns a 0-vector (origin) when the token doesn't exist in snlp's pretrained embeddings."""
+        """Get StanfordNLP's pretrained word embedding for given token.
+
+        token (Token): The token whose embedding will be returned
+        RETURNS (np.ndarray[ndim=1, dtype='float32']): the embedding/vector.
+            token.vector.size > 0 if StanfordNLP pipeline contains a processor with
+            embeddings, else token.vector.size == 0. A 0-vector (origin) will be returned
+            when the token doesn't exist in snlp's pretrained embeddings."""
         unit_id = self.svecs.vocab.unit2id(token.text)
         return self.svecs.emb[unit_id]
 
