@@ -178,6 +178,15 @@ class Tokenizer(object):
             doc.is_parsed = True
         return doc
 
+    def pipe(self, texts):
+        """Tokenize a stream of texts.
+
+        texts: A sequence of unicode texts.
+        YIELDS (Doc): A sequence of Doc objects, in order.
+        """
+        for text in texts:
+            yield self(text)
+
     def get_tokens_with_heads(self, snlp_doc):
         """Flatten the tokens in the StanfordNLP Doc and extract the token indices
         of the sentence start tokens to set is_sent_start.
