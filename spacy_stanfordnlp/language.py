@@ -6,6 +6,7 @@ from spacy.util import get_lang_class
 
 from stanfordnlp.models.common.vocab import UNK_ID
 from stanfordnlp.models.common.pretrain import Pretrain
+from stanfordnlp.pipeline.doc import Document
 
 import numpy
 import re
@@ -130,11 +131,12 @@ class Tokenizer(object):
         text (unicode): The text to process.
         RETURNS (spacy.tokens.Doc): The spaCy Doc object.
         """
-        snlp_doc = self.snlp(text)
+        snlp_doc = self.snlp(text) if text else Document("")
         text = snlp_doc.text
         tokens, heads = self.get_tokens_with_heads(snlp_doc)
         if not len(tokens):
-            raise ValueError("No tokens available.")
+            return Doc(self.vocab)
+
         words = []
         spaces = []
         pos = []
