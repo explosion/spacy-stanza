@@ -9,6 +9,7 @@ the CoNLL 2017 and 2018 shared task, which involves tokenization,
 part-of-speech tagging, morphological analysis, lemmatization and labelled
 dependency parsing in 58 languages. As of v1.0, Stanza also supports Named Entity Recognition. Previous version of this package were available as [`spacy-stanfordnlp`](https://pypi.python.org/pypi/spacy-stanfordnlp).
 
+[![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/16/master.svg?logo=azure-pipelines&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=16)
 [![PyPi](https://img.shields.io/pypi/v/spacy-stanza.svg?style=flat-square)](https://pypi.python.org/pypi/spacy-stanza)
 [![GitHub](https://img.shields.io/github/release/explosion/spacy-stanza/all.svg?style=flat-square)](https://github.com/explosion/spacy-stanza)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/ambv/black)
