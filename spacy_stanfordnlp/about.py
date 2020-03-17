@@ -1,7 +1,0 @@
-__title__ = "spacy-stanfordnlp"
-__version__ = "0.1.3"
-__summary__ = "Use the latest StanfordNLP research models directly in spaCy"
-__uri__ = "https://explosion.ai"
-__author__ = "Ines Montani"
-__email__ = "ines@explosion.ai"
-__license__ = "MIT"

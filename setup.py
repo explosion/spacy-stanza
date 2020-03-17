@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 
 def setup_package():
-    package_name = "spacy_stanfordnlp"
+    package_name = "spacy_stanza"
     root = os.path.abspath(os.path.dirname(__file__))
 
     # Read in package meta from about.py
@@ -22,7 +22,7 @@ def setup_package():
         readme = f.read()
 
     setup(
-        name="spacy-stanfordnlp",
+        name="spacy-stanza",
         description=about["__summary__"],
         long_description=readme,
         long_description_content_type="text/markdown",
@@ -32,19 +32,16 @@ def setup_package():
         version=about["__version__"],
         license=about["__license__"],
         packages=find_packages(),
-        install_requires=["spacy>=2.1.0", "stanfordnlp>=0.1.0,<0.2.1"],
+        install_requires=["spacy>=2.1.0", "stanza>=1.0.0,<1.1.0"],
         python_requires=">=3.6",
-        entry_points={
-            "spacy_languages": [
-                "stanfordnlp_en = spacy_stanfordnlp:StanfordNLPLanguage"
-            ]
-        },
+        entry_points={"spacy_languages": ["stanza_en = spacy_stanza:StanzaLanguage"]},
         classifiers=[
             "Development Status :: 4 - Beta",
             "Intended Audience :: Developers",
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
             "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.7"
+            "Programming Language :: Python :: 3.8",
         ],
         zip_safe=False,
     )
