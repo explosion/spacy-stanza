@@ -7,7 +7,11 @@ This package wraps the [Stanza](https://github.com/stanfordnlp/stanza)
 [spaCy](https://spacy.io) pipeline. The Stanford models achieved top accuracy in
 the CoNLL 2017 and 2018 shared task, which involves tokenization,
 part-of-speech tagging, morphological analysis, lemmatization and labelled
-dependency parsing in 58 languages. As of v1.0, Stanza also supports Named Entity Recognition. Previous version of this package were available as [`spacy-stanfordnlp`](https://pypi.python.org/pypi/spacy-stanfordnlp).
+dependency parsing in 58 languages. As of v1.0, Stanza also supports named
+entity recognition for selected languages.
+
+> ⚠️ Previous version of this package were available as
+> [`spacy-stanfordnlp`](https://pypi.python.org/pypi/spacy-stanfordnlp).
 
 [![Azure Pipelines](https://img.shields.io/azure-devops/build/explosion-ai/public/16/master.svg?logo=azure-pipelines&style=flat-square)](https://dev.azure.com/explosion-ai/public/_build?definitionId=16)
 [![PyPi](https://img.shields.io/pypi/v/spacy-stanza.svg?style=flat-square)](https://pypi.python.org/pypi/spacy-stanza)
