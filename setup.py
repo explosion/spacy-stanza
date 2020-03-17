@@ -40,7 +40,7 @@ def setup_package():
             "Intended Audience :: Developers",
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
             "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: 3.7"
+            "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
         ],
         zip_safe=False,
