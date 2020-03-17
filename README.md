@@ -25,7 +25,7 @@ your pretrained `stanza` model:
 - Lemmatization (`token.lemma` and `token.lemma_`)
 - Part-of-speech tagging (`token.tag`, `token.tag_`, `token.pos`, `token.pos_`)
 - Dependency parsing (`token.dep`, `token.dep_`, `token.head`)
-- Named entity recognition (`doc.ents`, `token.ent_type_`, `token.ent_iob_`)
+- Named entity recognition (`doc.ents`, `token.ent_type`, `token.ent_type_`, `token.ent_iob`, `token.ent_iob_`)
 - Sentence segmentation (`doc.sents`)
 
 ## ️️️⌛️ Installation
