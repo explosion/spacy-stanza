@@ -143,9 +143,19 @@ class Tokenizer(object):
         lemmas = []
         offset = 0
         is_aligned = self.check_aligned(text, tokens)
+        if not is_aligned:
+            warnings.warn("Due to multiword token expansion, the original "
+                "text has been replaced by space-separated expanded tokens.",
+                stacklevel=4,
+            )
         for i, token in enumerate(tokens):
             span = text[offset:]
-            if not len(span):
+            if is_aligned and not len(span):
+                warnings.warn(
+                    "Unable to align all tokens with the text. The doc may be "
+                    "truncated.",
+                    stacklevel=4,
+                )
                 break
             while len(span) and span[0].isspace():
                 # If we encounter leading whitespace, skip one character ahead
