@@ -10,6 +10,7 @@ from stanza import Document
 
 import numpy
 import re
+import warnings
 
 
 class StanzaLanguage(Language):
@@ -171,9 +172,17 @@ class Tokenizer(object):
         ents = []
         for ent in snlp_doc.entities:
             ent_span = doc.char_span(ent.start_char, ent.end_char, ent.type)
-            if ent_span:
-                ents.append(ent_span)
-        doc.ents = ents
+            ents.append(ent_span)
+        if not all(ents):
+            warnings.warn(
+                f"Can't set named entities because the character offsets don't "
+                f"map to valid tokens produced by the Stanza tokenizer:\n"
+                f"Words: {words}\n"
+                f"Entities: {[(e.text, e.type, e.start_char, e.end_char) for e in snlp_doc.entities]}",
+                stacklevel=4,
+            )
+        else:
+            doc.ents = ents
         # Overwrite lemmas separately to prevent them from being overwritten by spaCy
         lemma_array = numpy.array([[lemma] for lemma in lemmas], dtype="uint64")
         doc.from_array([LEMMA], lemma_array)

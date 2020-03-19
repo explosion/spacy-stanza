@@ -6,18 +6,14 @@ import stanza
 import pytest
 
 
-@pytest.fixture
-def lang():
-    return "en"
-
-
 def tags_equal(act, exp):
     """Check if each actual tag in act is equal to one or more expected tags in exp."""
     return all(a == e if isinstance(e, str) else a in e for a, e in zip(act, exp))
 
 
-def test_spacy_stanza(lang):
-    stanza.download(lang)
+def test_spacy_stanza_english():
+    lang = "en"
+    stanza.download()
     snlp = stanza.Pipeline(lang=lang)
     nlp = StanzaLanguage(snlp)
     assert nlp.lang == "stanza_" + lang
@@ -59,6 +55,15 @@ def test_spacy_stanza(lang):
     assert doc.ents[0].label_ == "PERSON"
     assert doc.ents[1].text == "Hawaii"
     assert doc.ents[1].label_ == "GPE"
+
+
+def test_spacy_stanza_german():
+    lang = "de"
+    stanza.download(lang)
+    snlp = stanza.Pipeline(lang=lang)
+    nlp = StanzaLanguage(snlp)
+    with pytest.warns(UserWarning):
+        doc = nlp("Auf dem Friedhof an der Straße Am Rosengarten")
 
 
 def test_get_defaults():
