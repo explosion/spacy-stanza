@@ -164,7 +164,7 @@ class Tokenizer(object):
             words.append(token.text)
             # Make sure all strings are in the vocabulary
             pos.append(self.vocab.strings.add(token.upos or ""))
-            tags.append(self.vocab.strings.add(token.xpos or ""))
+            tags.append(self.vocab.strings.add(token.xpos or token.feats or ""))
             deps.append(self.vocab.strings.add(token.deprel or ""))
             lemmas.append(self.vocab.strings.add(token.lemma or ""))
             offset += len(token.text)
