@@ -27,7 +27,11 @@ class StanzaLanguage(Language):
         kwargs: Optional config parameters.
         RETURNS (spacy.language.Language): The nlp object.
         """
-        lang = snlp.processors["tokenize"].config["lang"]  # TODO: is this right?
+        if hasattr(snlp, 'lang'):
+            lang = snlp.lang
+        else:
+            # backward compatible with stanza v1.0.0
+            lang = snlp.processors["tokenize"].config["lang"]
         self.snlp = snlp
         self.svecs = StanzaLanguage._find_embeddings(snlp)
         self.lang = "stanza_" + lang
