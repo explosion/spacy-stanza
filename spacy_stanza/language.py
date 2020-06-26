@@ -116,7 +116,6 @@ class Tokenizer(object):
     from_disk = lambda self, *args, **kwargs: None
     to_bytes = lambda self, *args, **kwargs: None
     from_bytes = lambda self, *args, **kwargs: None
-    _ws_pattern = re.compile(r"\s+")
 
     def __init__(self, snlp, vocab):
         """Initialize the tokenizer.
@@ -134,52 +133,73 @@ class Tokenizer(object):
         text (unicode): The text to process.
         RETURNS (spacy.tokens.Doc): The spaCy Doc object.
         """
-        snlp_doc = self.snlp(text) if text else Document("")
-        text = snlp_doc.text
-        tokens, heads = self.get_tokens_with_heads(snlp_doc)
-        if not len(tokens):
+        if not text:
             return Doc(self.vocab)
+        elif text.isspace():
+            return Doc(self.vocab, words=[text], spaces=[False])
+
+        snlp_doc = self.snlp(text)
+        text = snlp_doc.text
+        snlp_tokens, snlp_heads = self.get_tokens_with_heads(snlp_doc)
         words = []
         spaces = []
         pos = []
         tags = []
         deps = []
+        heads = []
         lemmas = []
         offset = 0
-        is_aligned = self.check_aligned(text, tokens)
-        if not is_aligned:
+        token_texts = [t.text for t in snlp_tokens]
+        is_aligned = True
+        try:
+            words, spaces = self.get_words_and_spaces(token_texts, text)
+        except ValueError:
+            words = token_texts
+            spaces = [True] * len(words)
+            is_aligned = False
             warnings.warn("Due to multiword token expansion, the original "
                 "text has been replaced by space-separated expanded tokens.",
                 stacklevel=4,
             )
-        for i, token in enumerate(tokens):
-            span = text[offset:]
-            if is_aligned and not len(span):
-                warnings.warn(
-                    "Unable to align all tokens with the text. The doc may be "
-                    "truncated.",
-                    stacklevel=4,
-                )
-                break
-            while len(span) and span[0].isspace():
-                # If we encounter leading whitespace, skip one character ahead
-                offset += 1
-                span = text[offset:]
-            words.append(token.text)
-            # Make sure all strings are in the vocabulary
-            pos.append(self.vocab.strings.add(token.upos or ""))
-            tags.append(self.vocab.strings.add(token.xpos or token.feats or ""))
-            deps.append(self.vocab.strings.add(token.deprel or ""))
-            lemmas.append(self.vocab.strings.add(token.lemma or ""))
-            offset += len(token.text)
-            span = text[offset:]
-            if i == len(tokens) - 1:
-                spaces.append(False)
-            elif not is_aligned:
-                spaces.append(True)
+        offset = 0
+        for i, word in enumerate(words):
+            if word.isspace():
+                # insert a space token
+                pos.append(self.vocab.strings.add("SPACE"))
+                tags.append(self.vocab.strings.add("_SP"))
+                deps.append(self.vocab.strings.add(""))
+                lemmas.append(self.vocab.strings.add(word))
+
+                # increment any heads left of this position that point beyond
+                # this position to the right (already present in heads)
+                for j in range(0, len(heads)):
+                    if j + heads[j] >= i:
+                        heads[j] += 1
+
+                # decrement any heads right of this position that point beyond
+                # this position to the left (yet to be added from snlp_heads)
+                for j in range(i + offset, len(snlp_heads)):
+                    if j + snlp_heads[j] < i + offset:
+                        snlp_heads[j] -= 1
+
+                # initial space tokens are attached to the following token,
+                # otherwise attach to the preceding token
+                if i == 0:
+                    heads.append(1)
+                else:
+                    heads.append(-1)
+
+                offset -= 1
             else:
-                next_token = tokens[i + 1]
-                spaces.append(not span.startswith(next_token.text))
+                token = snlp_tokens[i + offset]
+                assert word == token.text
+
+                pos.append(self.vocab.strings.add(token.upos or ""))
+                tags.append(self.vocab.strings.add(token.xpos or token.feats or ""))
+                deps.append(self.vocab.strings.add(token.deprel or ""))
+                heads.append(snlp_heads[i + offset])
+                lemmas.append(self.vocab.strings.add(token.lemma or ""))
+
         attrs = [POS, TAG, DEP, HEAD]
         array = numpy.array(list(zip(pos, tags, deps, heads)), dtype="uint64")
         doc = Doc(self.vocab, words=words, spaces=spaces).from_array(attrs, array)
@@ -187,10 +207,11 @@ class Tokenizer(object):
         for ent in snlp_doc.entities:
             ent_span = doc.char_span(ent.start_char, ent.end_char, ent.type)
             ents.append(ent_span)
-        if not all(ents):
+        if not is_aligned or not all(ents):
             warnings.warn(
-                f"Can't set named entities because the character offsets don't "
-                f"map to valid tokens produced by the Stanza tokenizer:\n"
+                f"Can't set named entities because of multi-word token "
+                f"expansion or because the character offsets don't map to "
+                f"valid tokens produced by the Stanza tokenizer:\n"
                 f"Words: {words}\n"
                 f"Entities: {[(e.text, e.type, e.start_char, e.end_char) for e in snlp_doc.entities]}",
                 stacklevel=4,
@@ -200,9 +221,9 @@ class Tokenizer(object):
         # Overwrite lemmas separately to prevent them from being overwritten by spaCy
         lemma_array = numpy.array([[lemma] for lemma in lemmas], dtype="uint64")
         doc.from_array([LEMMA], lemma_array)
-        if any(pos) and any(tags):
+        if any(pos) or any(tags):
             doc.is_tagged = True
-        if any(deps):
+        if any(deps) or any(heads):
             doc.is_parsed = True
         return doc
 
@@ -240,6 +261,31 @@ class Tokenizer(object):
             offset += sum(len(token.words) for token in sentence.tokens)
         return tokens, heads
 
-    def check_aligned(self, text, tokens):
-        token_texts = "".join(t.text for t in tokens)
-        return re.sub(self._ws_pattern, "", text) == token_texts
+    def get_words_and_spaces(self, words, text):
+        if "".join("".join(words).split()) != "".join(text.split()):
+            raise ValueError("Unable to align mismatched text and words.")
+        text_words = []
+        text_spaces = []
+        text_pos = 0
+        # normalize words to remove all whitespace tokens
+        norm_words = [word for word in words if not word.isspace()]
+        # align words with text
+        for word in norm_words:
+            try:
+                word_start = text[text_pos:].index(word)
+            except ValueError:
+                raise ValueError("Unable to align mismatched text and words.")
+            if word_start > 0:
+                text_words.append(text[text_pos : text_pos + word_start])
+                text_spaces.append(False)
+                text_pos += word_start
+            text_words.append(word)
+            text_spaces.append(False)
+            text_pos += len(word)
+            if text_pos < len(text) and text[text_pos] == " ":
+                text_spaces[-1] = True
+                text_pos += 1
+        if text_pos < len(text):
+            text_words.append(text[text_pos:])
+            text_spaces.append(False)
+        return (text_words, text_spaces)

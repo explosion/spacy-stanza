@@ -56,6 +56,17 @@ def test_spacy_stanza_english():
     assert doc.ents[1].text == "Hawaii"
     assert doc.ents[1].label_ == "GPE"
 
+    # Test whitespace alignment
+    doc = nlp(" Barack  Obama  was  born\n\nin Hawaii.")
+    assert [t.pos_ for t in doc] == ['SPACE', 'PROPN', 'SPACE', 'PROPN', 'SPACE', 'AUX', 'SPACE', 'VERB', 'SPACE', 'ADP', 'PROPN', 'PUNCT']
+    assert [t.dep_ for t in doc] == ['', 'nsubj:pass', '', 'flat', '', 'aux:pass', '', 'root', '', 'case', 'root', 'punct']
+    assert [t.head.i for t in doc] == [1, 7, 1, 1, 3, 7, 5, 7, 7, 10, 10, 10]
+    assert len(doc.ents) == 2
+    assert doc.ents[0].text == "Barack  Obama"
+    assert doc.ents[0].label_ == "PERSON"
+    assert doc.ents[1].text == "Hawaii"
+    assert doc.ents[1].label_ == "GPE"
+
 
 def test_spacy_stanza_german():
     lang = "de"
