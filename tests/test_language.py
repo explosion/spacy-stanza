@@ -13,7 +13,7 @@ def tags_equal(act, exp):
 
 def test_spacy_stanza_english():
     lang = "en"
-    stanza.download()
+    stanza.download(lang)
     snlp = stanza.Pipeline(lang=lang)
     nlp = StanzaLanguage(snlp)
     assert nlp.lang == "stanza_" + lang
@@ -75,6 +75,21 @@ def test_spacy_stanza_german():
     nlp = StanzaLanguage(snlp)
     with pytest.warns(UserWarning):
         doc = nlp("Auf dem Friedhof an der Straße Am Rosengarten")
+
+def test_spacy_stanza_tokenizer_options():
+    lang = "en"
+    stanza.download(lang)
+    snlp = stanza.Pipeline('en', processors={'tokenize': 'spacy'})
+    nlp = StanzaLanguage(snlp)
+    # whitespace tokens from spacy tokenizer are handled correctly
+    doc = nlp(" Barack  Obama  was  born\n\nin Hawaii.")
+
+    snlp = stanza.Pipeline('en', tokenize_pretokenized=True)
+    nlp = StanzaLanguage(snlp)
+    # pretokenized text is handled correctly (possibly with warnings because
+    # the character offsets from stanza 1.0.0 are incorrect)
+    doc = nlp("Barack Obama was born in Hawaii.\nBarack Obama was born in Hawaii.")
+    doc = nlp(" Barack  Obama  was  born\n\n in Hawaii.\nBarack Obama was born in Hawaii.")
 
 
 def test_get_defaults():

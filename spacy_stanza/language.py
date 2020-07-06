@@ -157,13 +157,14 @@ class Tokenizer(object):
             words = token_texts
             spaces = [True] * len(words)
             is_aligned = False
-            warnings.warn("Due to multiword token expansion, the original "
-                "text has been replaced by space-separated expanded tokens.",
+            warnings.warn("Due to multiword token expansion or an alignment "
+                "issue, the original text has been replaced by space-separated "
+                "expanded tokens.",
                 stacklevel=4,
             )
         offset = 0
         for i, word in enumerate(words):
-            if word.isspace():
+            if word.isspace() and word != snlp_tokens[i + offset].text:
                 # insert a space token
                 pos.append(self.vocab.strings.add("SPACE"))
                 tags.append(self.vocab.strings.add("_SP"))
