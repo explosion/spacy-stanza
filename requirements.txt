@@ -1,4 +1,4 @@
-spacy>=2.1.0
-stanza>=1.0.0,<1.1.0
+spacy>=2.1.0,<3.0.0
+stanza>=1.0.0,<1.2.0
 # Development dependencies
 pytest>=4.0.0,<5.0.0
