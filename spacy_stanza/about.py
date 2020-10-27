@@ -1,5 +1,5 @@
 __title__ = "spacy-stanza"
-__version__ = "0.2.4"
+__version__ = "0.3.0"
 __summary__ = "Use the latest Stanza (StanfordNLP) research models directly in spaCy"
 __uri__ = "https://explosion.ai"
 __author__ = "Ines Montani"

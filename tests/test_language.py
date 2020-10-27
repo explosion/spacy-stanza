@@ -32,14 +32,16 @@ def test_spacy_stanza_english():
     assert tags_equal([t.pos_ for t in doc], pos_exp)
 
     assert [t.tag_ for t in doc] == ["UH", "NN", ".", "DT", "VBZ", "DT", "NN", '.']
+    assert [str(t.morph) for t in doc] == ['', 'Number=Sing', '', 'Number=Sing|PronType=Dem', 'Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin', 'Definite=Ind|PronType=Art', 'Number=Sing', '']
     assert [t.dep_ for t in doc] == ["root", "vocative", "punct", "nsubj", "cop", "det", "root", "punct"]
-    assert [t.is_sent_start for t in doc] == [True, None, None, True, None, None, None, None]
+    assert [t.is_sent_start for t in doc] == [True, False, False, True, False, False, False, False]
     assert any([t.is_stop for t in doc])
     # fmt: on
     assert len(list(doc.sents)) == 2
-    assert doc.is_tagged
-    assert doc.is_parsed
-    assert doc.is_sentenced
+    assert doc.has_annotation("TAG")
+    assert doc.has_annotation("MORPH")
+    assert doc.has_annotation("DEP")
+    assert doc.has_annotation("SENT_START")
 
     docs = list(nlp.pipe(["Hello world", "This is a test"]))
     assert docs[0].text == "Hello world"
