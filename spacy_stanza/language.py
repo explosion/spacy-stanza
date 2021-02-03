@@ -1,8 +1,8 @@
 # coding: utf8
-from spacy.symbols import POS, TAG, DEP, LEMMA, HEAD
 from spacy.language import Language
 from spacy.tokens import Doc, Span
 from spacy.util import get_lang_class
+from spacy.vocab import create_vocab
 
 from stanza.models.common.vocab import UNK_ID
 from stanza.models.common.pretrain import Pretrain
@@ -27,7 +27,7 @@ class StanzaLanguage(Language):
         kwargs: Optional config parameters.
         RETURNS (spacy.language.Language): The nlp object.
         """
-        if hasattr(snlp, 'lang'):
+        if hasattr(snlp, "lang"):
             lang = snlp.lang
         else:
             # backward compatible with stanza v1.0.0
@@ -36,10 +36,12 @@ class StanzaLanguage(Language):
         self.svecs = StanzaLanguage._find_embeddings(snlp)
         self.lang = "stanza_" + lang
         self.Defaults = get_defaults(lang)
-        self.vocab = self.Defaults.create_vocab()
+        self.vocab = create_vocab(lang, self.Defaults)
         self.tokenizer = Tokenizer(snlp, self.vocab)
-        self.pipeline = []
+        self._components = []
+        self._disabled = set()
         self.max_length = kwargs.get("max_length", 10 ** 6)
+        self.batch_size = kwargs.get("batch_size", 256)
         self._meta = (
             {"lang": self.lang, "stanza": snlp.config} if meta is None else dict(meta)
         )
@@ -145,6 +147,7 @@ class Tokenizer(object):
         spaces = []
         pos = []
         tags = []
+        morphs = []
         deps = []
         heads = []
         lemmas = []
@@ -157,7 +160,8 @@ class Tokenizer(object):
             words = token_texts
             spaces = [True] * len(words)
             is_aligned = False
-            warnings.warn("Due to multiword token expansion or an alignment "
+            warnings.warn(
+                "Due to multiword token expansion or an alignment "
                 "issue, the original text has been replaced by space-separated "
                 "expanded tokens.",
                 stacklevel=4,
@@ -166,10 +170,11 @@ class Tokenizer(object):
         for i, word in enumerate(words):
             if word.isspace() and word != snlp_tokens[i + offset].text:
                 # insert a space token
-                pos.append(self.vocab.strings.add("SPACE"))
-                tags.append(self.vocab.strings.add("_SP"))
-                deps.append(self.vocab.strings.add(""))
-                lemmas.append(self.vocab.strings.add(word))
+                pos.append("SPACE")
+                tags.append("_SP")
+                morphs.append("")
+                deps.append("")
+                lemmas.append(word)
 
                 # increment any heads left of this position that point beyond
                 # this position to the right (already present in heads)
@@ -195,15 +200,24 @@ class Tokenizer(object):
                 token = snlp_tokens[i + offset]
                 assert word == token.text
 
-                pos.append(self.vocab.strings.add(token.upos or ""))
-                tags.append(self.vocab.strings.add(token.xpos or token.feats or ""))
-                deps.append(self.vocab.strings.add(token.deprel or ""))
+                pos.append(token.upos or "")
+                tags.append(token.xpos or token.feats or "")
+                morphs.append(token.feats or "")
+                deps.append(token.deprel or "")
                 heads.append(snlp_heads[i + offset])
-                lemmas.append(self.vocab.strings.add(token.lemma or ""))
+                lemmas.append(token.lemma or "")
 
-        attrs = [POS, TAG, DEP, HEAD]
-        array = numpy.array(list(zip(pos, tags, deps, heads)), dtype="uint64")
-        doc = Doc(self.vocab, words=words, spaces=spaces).from_array(attrs, array)
+        doc = Doc(
+            self.vocab,
+            words=words,
+            spaces=spaces,
+            pos=pos,
+            tags=tags,
+            morphs=morphs,
+            lemmas=lemmas,
+            deps=deps,
+            heads=[head + i for i, head in enumerate(heads)],
+        )
         ents = []
         for ent in snlp_doc.entities:
             ent_span = doc.char_span(ent.start_char, ent.end_char, ent.type)
@@ -219,13 +233,6 @@ class Tokenizer(object):
             )
         else:
             doc.ents = ents
-        # Overwrite lemmas separately to prevent them from being overwritten by spaCy
-        lemma_array = numpy.array([[lemma] for lemma in lemmas], dtype="uint64")
-        doc.from_array([LEMMA], lemma_array)
-        if any(pos) or any(tags):
-            doc.is_tagged = True
-        if any(deps) or any(heads):
-            doc.is_parsed = True
         return doc
 
     def pipe(self, texts):

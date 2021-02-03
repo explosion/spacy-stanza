@@ -32,14 +32,16 @@ def test_spacy_stanza_english():
     assert tags_equal([t.pos_ for t in doc], pos_exp)
 
     assert [t.tag_ for t in doc] == ["UH", "NN", ".", "DT", "VBZ", "DT", "NN", '.']
+    assert [str(t.morph) for t in doc] == ['', 'Number=Sing', '', 'Number=Sing|PronType=Dem', 'Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin', 'Definite=Ind|PronType=Art', 'Number=Sing', '']
     assert [t.dep_ for t in doc] == ["root", "vocative", "punct", "nsubj", "cop", "det", "root", "punct"]
-    assert [t.is_sent_start for t in doc] == [True, None, None, True, None, None, None, None]
+    assert [t.is_sent_start for t in doc] == [True, False, False, True, False, False, False, False]
     assert any([t.is_stop for t in doc])
     # fmt: on
     assert len(list(doc.sents)) == 2
-    assert doc.is_tagged
-    assert doc.is_parsed
-    assert doc.is_sentenced
+    assert doc.has_annotation("TAG")
+    assert doc.has_annotation("MORPH")
+    assert doc.has_annotation("DEP")
+    assert doc.has_annotation("SENT_START")
 
     docs = list(nlp.pipe(["Hello world", "This is a test"]))
     assert docs[0].text == "Hello world"
@@ -60,7 +62,7 @@ def test_spacy_stanza_english():
     doc = nlp(" Barack  Obama  was  born\n\nin Hawaii.")
     assert [t.pos_ for t in doc] == ['SPACE', 'PROPN', 'SPACE', 'PROPN', 'SPACE', 'AUX', 'SPACE', 'VERB', 'SPACE', 'ADP', 'PROPN', 'PUNCT']
     assert [t.dep_ for t in doc] == ['', 'nsubj:pass', '', 'flat', '', 'aux:pass', '', 'root', '', 'case', 'root', 'punct']
-    assert [t.head.i for t in doc] == [1, 7, 1, 1, 3, 7, 5, 7, 7, 10, 10, 10]
+    assert [t.head.i for t in doc] == [0, 7, 2, 1, 4, 7, 6, 7, 8, 10, 10, 10]
     assert len(doc.ents) == 2
     assert doc.ents[0].text == "Barack  Obama"
     assert doc.ents[0].label_ == "PERSON"
