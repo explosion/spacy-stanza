@@ -41,6 +41,7 @@ class StanzaLanguage(Language):
         self._components = []
         self._disabled = set()
         self.max_length = kwargs.get("max_length", 10 ** 6)
+        self.batch_size = kwargs.get("batch_size", 256)
         self._meta = (
             {"lang": self.lang, "stanza": snlp.config} if meta is None else dict(meta)
         )
@@ -206,7 +207,6 @@ class Tokenizer(object):
                 heads.append(snlp_heads[i + offset])
                 lemmas.append(token.lemma or "")
 
-        print(pos, tags, morphs, deps, heads, lemmas)
         doc = Doc(
             self.vocab,
             words=words,

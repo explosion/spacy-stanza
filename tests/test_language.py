@@ -62,7 +62,7 @@ def test_spacy_stanza_english():
     doc = nlp(" Barack  Obama  was  born\n\nin Hawaii.")
     assert [t.pos_ for t in doc] == ['SPACE', 'PROPN', 'SPACE', 'PROPN', 'SPACE', 'AUX', 'SPACE', 'VERB', 'SPACE', 'ADP', 'PROPN', 'PUNCT']
     assert [t.dep_ for t in doc] == ['', 'nsubj:pass', '', 'flat', '', 'aux:pass', '', 'root', '', 'case', 'root', 'punct']
-    assert [t.head.i for t in doc] == [1, 7, 1, 1, 3, 7, 5, 7, 7, 10, 10, 10]
+    assert [t.head.i for t in doc] == [0, 7, 2, 1, 4, 7, 6, 7, 8, 10, 10, 10]
     assert len(doc.ents) == 2
     assert doc.ents[0].text == "Barack  Obama"
     assert doc.ents[0].label_ == "PERSON"
