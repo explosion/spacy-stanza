@@ -42,7 +42,7 @@ For spaCy v2, install v0.2.x and refer to the [v0.2.x usage
 documentation](https://github.com/explosion/spacy-stanza/tree/v0.2.x#-usage--examples):
 
 ```bash
-python -m pip install "spacy-stanza<0.3.0"
+pip install "spacy-stanza<0.3.0"
 ```
 
 Make sure to also
