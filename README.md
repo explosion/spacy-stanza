@@ -157,9 +157,9 @@ same API as [`spacy.blank()`](https://spacy.io/api/top-level#spacy.blank):
   )
   ```
 
-The config specifies all `Pipeline` options. For example, the config for the
-for last example above, an English pipeline with pretokenized texts, looks like
-this:
+The config specifies all `Pipeline` options in the `[nlp.tokenizer]` block. For
+example, the config for the last example above, an English pipeline with
+pretokenized texts:
 
 ```ini
 [nlp.tokenizer]
@@ -200,12 +200,11 @@ the default model directory or in the path specified under
 ### Adding additional spaCy pipeline components
 
 By default, the spaCy pipeline in the `nlp` object returned by
-`spacy_stanza.blank()` be empty, because all `stanza` attributes are computed
-and set by the custom tokenizer,
+`spacy_stanza.blank()` will be empty, because all `stanza` attributes are
+computed and set within the custom tokenizer,
 [`StanzaTokenizer`](spacy_stanza/tokenizer.py). But since it's a regular `nlp`
 object, you can add your own components to the pipeline. For example, you could
-add and train [your own custom text classification
-component](https://spacy.io/usage/training#textcat) and use `nlp.add_pipe` to
-add it to the pipeline, or augment the named entities with your own rule-based
+add [your own custom text classification
+component](https://spacy.io/usage/training) with `nlp.add_pipe("textcat", source=source_nlp)`, or augment the named entities with your own rule-based
 patterns using the [`EntityRuler`
 component](https://spacy.io/usage/rule-based-matching#entityruler).
