@@ -1,5 +1,4 @@
 from typing import Any, Dict, Union
-from copy import deepcopy
 from thinc.api import Config
 from spacy import blank as spacy_blank, util, Language, Vocab
 
