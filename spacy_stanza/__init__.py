@@ -3,7 +3,7 @@ from copy import deepcopy
 from thinc.api import Config
 from spacy import blank as spacy_blank, util, Language, Vocab
 
-from .tokenizer import DEFAULT_TOKENIZER_CONFIG
+from . import tokenizer
 
 
 def blank(
@@ -26,20 +26,13 @@ def blank(
     """
     # We should accept both dot notation and nested dict here for consistency
     config = util.dot_to_dict(config)
-    # Copy any config settings into a new editable config, adding an
-    # nlp.tokenizer block if necessary
-    stanza_config = {}
-    stanza_config.update(deepcopy(config))
-    if "nlp" not in stanza_config:
-        stanza_config["nlp"] = {}
-    if "tokenizer" not in stanza_config["nlp"]:
-        stanza_config["nlp"]["tokenizer"] = {}
-    # Replace the nlp.tokenizer block with the default stanza config
-    stanza_config["nlp"]["tokenizer"] = deepcopy(DEFAULT_TOKENIZER_CONFIG)
-    # Use the same language code for stanza by default
-    stanza_config["nlp"]["tokenizer"]["lang"] = name
-    # Update the default stanza config with any user-provided settings
-    stanza_config["nlp"]["tokenizer"].update(
-        deepcopy(config.get("nlp", {}).get("tokenizer", {}))
-    )
-    return spacy_blank(name, vocab=vocab, config=stanza_config, meta=meta)
+    if "nlp" not in config:
+        config["nlp"] = {}
+    if "tokenizer" not in config["nlp"]:
+        config["nlp"]["tokenizer"] = {}
+    # Set the stanza tokenizer
+    config["nlp"]["tokenizer"]["@tokenizers"] = "spacy_stanza.PipelineAsTokenizer.v1"
+    # Set the stanza lang if not provided
+    if "lang" not in config["nlp"]["tokenizer"]:
+        config["nlp"]["tokenizer"]["lang"] = name
+    return spacy_blank(name, vocab=vocab, config=config, meta=meta)

@@ -9,27 +9,12 @@ from stanza.models.common.vocab import UNK_ID
 from stanza.models.common.pretrain import Pretrain
 
 
-# The config parameters are identical to the parameters for the Pipeline:
-# https://stanfordnlp.github.io/stanza/pipeline.html#pipeline
-DEFAULT_TOKENIZER_CONFIG = {
-    "@tokenizers": "spacy_stanza.PipelineAsTokenizer.v1",
-    "lang": "",
-    "model_dir": "",
-    "package": "default",
-    "logging_level": None,
-    "verbose": None,
-    "use_gpu": True,
-    "kwargs": {},
-    "processors": {},
-}
-
-
 @registry.tokenizers("spacy_stanza.PipelineAsTokenizer.v1")
 def create_tokenizer(
     lang: str = "",
     model_dir: str = "",
     package: str = "default",
-    processors: Union[dict, str] = "",
+    processors: Union[dict, str] = {},
     logging_level: Optional[Union[int, str]] = None,
     verbose: Optional[bool] = None,
     use_gpu: bool = True,
