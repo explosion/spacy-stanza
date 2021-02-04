@@ -3,11 +3,11 @@
 # spaCy + Stanza (formerly StanfordNLP)
 
 This package wraps the [Stanza](https://github.com/stanfordnlp/stanza)
-(formerly StanfordNLP) library, so you can use Stanford's models as a
-[spaCy](https://spacy.io) pipeline. The Stanford models achieved top accuracy in
-the CoNLL 2017 and 2018 shared task, which involves tokenization,
-part-of-speech tagging, morphological analysis, lemmatization and labelled
-dependency parsing in 58 languages. As of v1.0, Stanza also supports named
+(formerly StanfordNLP) library, so you can use Stanford's models in a
+[spaCy](https://spacy.io) pipeline. The Stanford models achieved top accuracy
+in the CoNLL 2017 and 2018 shared task, which involves tokenization,
+part-of-speech tagging, morphological analysis, lemmatization and labeled
+dependency parsing in 68 languages. As of v1.0, Stanza also supports named
 entity recognition for selected languages.
 
 > ⚠️ Previous version of this package were available as
@@ -24,32 +24,53 @@ your pretrained `stanza` model:
 - Statistical tokenization (reflected in the `Doc` and its tokens)
 - Lemmatization (`token.lemma` and `token.lemma_`)
 - Part-of-speech tagging (`token.tag`, `token.tag_`, `token.pos`, `token.pos_`)
+- Morphological analysis (`token.morph`)
 - Dependency parsing (`token.dep`, `token.dep_`, `token.head`)
 - Named entity recognition (`doc.ents`, `token.ent_type`, `token.ent_type_`, `token.ent_iob`, `token.ent_iob_`)
 - Sentence segmentation (`doc.sents`)
 
 ## ️️️⌛️ Installation
 
+As of v0.3.0 `spacy-stanza` is only compatible with **spaCy v3.x**. To install
+the most recent version:
+
 ```bash
 pip install spacy-stanza
 ```
 
-Make sure to also install one of the
-[pre-trained Stanza models](https://stanfordnlp.github.io/stanza/models.html).
+For spaCy v2, install v0.2.x and refer to the [v0.2.x usage
+documentation](https://github.com/explosion/spacy-stanza/tree/v0.2.x#-usage--examples):
+
+```bash
+python -m pip install "spacy-stanza<0.3.0"
+```
+
+Make sure to also
+[download](https://stanfordnlp.github.io/stanza/download_models.html) one of
+the [pre-trained Stanza
+models](https://stanfordnlp.github.io/stanza/models.html).
 
 ## 📖 Usage & Examples
 
-The `StanzaLanguage` class can be initialized with a loaded Stanza
-pipeline and returns a spaCy [`Language` object](https://spacy.io/api/language),
-i.e. the `nlp` object you can use to process text and create a
-[`Doc` object](https://spacy.io/api/doc).
+> ⚠️ **Important note:** This package has been refactored to take advantage of
+> [spaCy v3.0](https://spacy.io). Previous versions that were built for [spaCy
+> v2.x](https://v2.spacy.io) worked considerably differently. Please see
+> previous tagged versions of this README for documentation on prior versions.
+
+Use `spacy_stanza.blank()` to create an `nlp` object that you can use to
+process a text with a Stanza pipeline and create a spaCy [`Doc`
+object](https://spacy.io/api/doc). By default, both the spaCy pipeline and the
+Stanza pipeline will be initialized with the same `lang`, e.g. "en":
 
 ```python
 import stanza
-from spacy_stanza import StanzaLanguage
+import spacy_stanza
 
-snlp = stanza.Pipeline(lang="en")
-nlp = StanzaLanguage(snlp)
+# Download the stanza model if necessary
+stanza.download("en")
+
+# Initialize the pipeline
+nlp = spacy_stanza.blank("en")
 
 doc = nlp("Barack Obama was born in Hawaii. He was elected president in 2008.")
 for token in doc:
@@ -58,7 +79,7 @@ print(doc.ents)
 ```
 
 If language data for the given language is available in spaCy, the respective
-language class will be used as the base for the `nlp` object – for example,
+language class can be used as the base for the `nlp` object – for example,
 `English()`. This lets you use spaCy's lexical attributes like `is_stop` or
 `like_num`. The `nlp` object follows the same API as any other spaCy `Language`
 class – so you can visualize the `Doc` objects with displaCy, add custom
@@ -74,64 +95,117 @@ print([token.like_num for token in doc])
 from spacy import displacy
 displacy.serve(doc)  # or displacy.render if you're in a Jupyter notebook
 
-# Efficient processing with nlp.pipe
+# Process texts with nlp.pipe
 for doc in nlp.pipe(["Lots of texts", "Even more texts", "..."]):
     print(doc.text)
 
 # Combine with your own custom pipeline components
+from spacy import Language
+@Language.component("custom_component")
 def custom_component(doc):
     # Do something to the doc here
+    print(f"Custom component called: {doc.text}")
     return doc
 
-nlp.add_pipe(custom_component)
+nlp.add_pipe("custom_component")
+doc = nlp("Some text")
 
-# Serialize it to a numpy array
+# Serialize attributes to a numpy array
 np_array = doc.to_array(['ORTH', 'LEMMA', 'POS'])
 ```
 
-### Experimental: Mixing and matching pipeline components
+### Stanza Pipeline options
 
-By default, the `nlp` object's pipeline will be empty, because all attributes
-are computed once and set in the custom [`Tokenizer`](spacy_stanza/language.py).
-But since it's a regular `nlp` object, you can add your own components to the
-pipeline. For example, you could add and train
-[your own custom text classification component](https://spacy.io/usage/training#textcat)
-and use `nlp.add_pipe` to add it to the pipeline, or augment the named
-entities with your own rule-based patterns using the
-[`EntityRuler` component](https://spacy.io/usage/rule-based-matching#entityruler).
+Additional options for the Stanza
+[`Pipeline`](https://stanfordnlp.github.io/stanza/pipeline.html#pipeline) can
+be provided in the `config` passed to `spacy_stanza.blank()`, which has the
+same API as [`spacy.blank()`](https://spacy.io/api/top-level#spacy.blank):
 
-### Advanced: serialization and entry points
+- Provide the Stanza language as `nlp.tokenizer.lang`. For Stanza languages
+  without spaCy support, use "xx" for the spaCy language setting:
 
-The spaCy `nlp` object created by `StanzaLanguage` exposes its language as
-`stanza_xx`.
+  ```python
+  # Initialize a pipeline for Coptic
+  nlp = spacy_stanza.blank(
+      "xx", config={"nlp": {"tokenizer": {"lang": "cop"}}}
+  )
+  ```
 
-```python
-from spacy.util import get_lang_class
-lang_cls = get_lang_class("stanza_en")
+- Provide the Stanza pipeline package as `nlp.tokenizer.package`:
+
+  ```python
+  # Initialize a German pipeline with the `hdt` package
+  nlp = spacy_stanza.blank(
+      "de", config={"nlp": {"tokenizer": {"package": "hdt"}}}
+  )
+  ```
+
+- Tokenize with spaCy rather than the statistical tokenizer (only for English)
+
+  ```python
+  nlp = spacy_stanza.blank(
+      "en", config={"nlp": {"tokenizer": {"processors": {"tokenize": "spacy"}}}}
+  )
+  ```
+
+- Provide any additional settings under `nlp.tokenizer.kwargs`:
+
+  ```python
+  # Provide pretokenized texts (whitespace tokenization)
+  nlp = spacy_stanza.blank(
+      "de", config={"nlp": {"tokenizer": {"kwargs": {"tokenize_pretokenized": True}}}}
+  )
+  ```
+
+The config specifies all `Pipeline` options. For example, the config for the
+for last example above, an English pipeline with pretokenized texts, looks like
+this:
+
+```ini
+[nlp.tokenizer]
+@tokenizers = "spacy_stanza.PipelineAsTokenizer.v1"
+lang = "de"
+model_dir = ""
+package = "default"
+logging_level = null
+verbose = null
+use_gpu = true
+
+[nlp.tokenizer.kwargs]
+tokenize_pretokenized = true
+
+[nlp.tokenizer.processors]
 ```
 
-Normally, the above would fail because spaCy doesn't include a language class
-`stanza_en`. But because this package exposes a `spacy_languages` entry
-point in its [`setup.py`](setup.py) that points to `StanzaLanguage`, spaCy
-knows how to initialize it.
+### Serialization
 
-This means that saving to and loading from disk works:
+The full Stanza pipeline configuration is stored in the spaCy pipeline
+[config](https://spacy.io/usage/training#config), so you can save and load the
+pipeline just like any other `nlp` pipeline:
 
 ```python
-snlp = stanza.Pipeline(lang="en")
-nlp = StanzaLanguage(snlp)
+# Save to a local directory
 nlp.to_disk("./stanza-spacy-model")
+
+# Reload the pipeline
+nlp = spacy.load("./stanza-spacy-model")
 ```
 
-Additional arguments on `spacy.load` are automatically passed down to the
-language class and pipeline components. So when loading the saved model, you can
-pass in the `snlp` argument:
+Note that this **does not save any Stanza model data by default**. The Stanza
+models are very large, so for now, this package expects you to download the
+models separately with `stanza.download()` and have them available either in
+the default model directory or in the path specified under
+`[nlp.tokenizer.model_dir]` in the config.
 
-```python
-snlp = stanza.Pipeline(lang="en")
-nlp = spacy.load("./stanza-spacy-model", snlp=snlp)
-```
+### Adding additional spaCy pipeline components
 
-Note that this **will not save any model data by default**. The Stanza
-models are very large, so for now, this package expects that you load them
-separately.
+By default, the spaCy pipeline in the `nlp` object returned by
+`spacy_stanza.blank()` be empty, because all `stanza` attributes are computed
+and set by the custom tokenizer,
+[`StanzaTokenizer`](spacy_stanza/tokenizer.py). But since it's a regular `nlp`
+object, you can add your own components to the pipeline. For example, you could
+add and train [your own custom text classification
+component](https://spacy.io/usage/training#textcat) and use `nlp.add_pipe` to
+add it to the pipeline, or augment the named entities with your own rule-based
+patterns using the [`EntityRuler`
+component](https://spacy.io/usage/rule-based-matching#entityruler).
