@@ -165,7 +165,7 @@ pretokenized texts:
 [nlp.tokenizer]
 @tokenizers = "spacy_stanza.PipelineAsTokenizer.v1"
 lang = "de"
-model_dir = ""
+dir = null
 package = "default"
 logging_level = null
 verbose = null
@@ -195,7 +195,7 @@ Note that this **does not save any Stanza model data by default**. The Stanza
 models are very large, so for now, this package expects you to download the
 models separately with `stanza.download()` and have them available either in
 the default model directory or in the path specified under
-`[nlp.tokenizer.model_dir]` in the config.
+`[nlp.tokenizer.dir]` in the config.
 
 ### Adding additional spaCy pipeline components
 

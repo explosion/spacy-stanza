@@ -5,6 +5,7 @@ from spacy.tokens import Doc
 from spacy.util import registry
 
 from stanza import Pipeline
+from stanza.resources.common import DEFAULT_MODEL_DIR
 from stanza.models.common.vocab import UNK_ID
 from stanza.models.common.pretrain import Pretrain
 
@@ -12,7 +13,7 @@ from stanza.models.common.pretrain import Pretrain
 @registry.tokenizers("spacy_stanza.PipelineAsTokenizer.v1")
 def create_tokenizer(
     lang: str = "",
-    model_dir: str = "",
+    dir: Optional[str] = None,
     package: str = "default",
     processors: Union[dict, str] = {},
     logging_level: Optional[Union[int, str]] = None,
@@ -23,7 +24,7 @@ def create_tokenizer(
     def tokenizer_factory(
         nlp,
         lang=lang,
-        model_dir=model_dir,
+        dir=dir,
         package=package,
         processors=processors,
         logging_level=logging_level,
@@ -31,9 +32,11 @@ def create_tokenizer(
         use_gpu=use_gpu,
         kwargs=kwargs,
     ) -> StanzaTokenizer:
+        if dir is None:
+            dir = DEFAULT_MODEL_DIR
         snlp = Pipeline(
             lang=lang,
-            model_dir=model_dir,
+            dir=dir,
             package=package,
             processors=processors,
             logging_level=logging_level,
