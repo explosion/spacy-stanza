@@ -1,16 +1,19 @@
-from typing import Any, Dict, Union
-from thinc.api import Config
-from spacy import blank as spacy_blank, util, Language, Vocab
+from typing import Optional, Union
+from spacy import blank, Language
 
 from . import tokenizer
 
 
-def blank(
+def load_pipeline(
     name: str,
     *,
-    vocab: Union[Vocab, bool] = True,
-    config: Union[Dict[str, Any], Config] = util.SimpleFrozenDict(),
-    meta: Dict[str, Any] = util.SimpleFrozenDict(),
+    lang: str = "",
+    dir: Optional[str] = None,
+    package: str = "default",
+    processors: Union[dict, str] = {},
+    logging_level: Optional[Union[int, str]] = None,
+    verbose: Optional[bool] = None,
+    use_gpu: bool = True,
     **kwargs,
 ) -> Language:
     """Create a blank nlp object for a given language code with a stanza
@@ -19,24 +22,29 @@ def blank(
     in the stanza pipeline settings in config["nlp"]["tokenizer"].
 
     name (str): The language code, e.g. "en".
-    vocab (Vocab): A Vocab object. If True, a vocab is created.
-    config (Dict[str, Any] / Config): Optional config overrides.
-    meta (Dict[str, Any]): Overrides for nlp.meta.
+    lang: str = "",
+    dir: Optional[str] = None,
+    package: str = "default",
+    processors: Union[dict, str] = {},
+    logging_level: Optional[Union[int, str]] = None,
+    verbose: Optional[bool] = None,
+    use_gpu: bool = True,
     **kwargs: Options for the individual stanza processors.
     RETURNS (Language): The nlp object.
     """
-    # We should accept both dot notation and nested dict here for consistency
-    config = util.dot_to_dict(config)
-    if "nlp" not in config:
-        config["nlp"] = {}
-    if "tokenizer" not in config["nlp"]:
-        config["nlp"]["tokenizer"] = {}
-    if "kwargs" not in config["nlp"]["tokenizer"]:
-        config["nlp"]["tokenizer"]["kwargs"] = {}
+    # Create an empty config skeleton
+    config = {"nlp": {"tokenizer": {"kwargs": {}}}}
+    if lang == "":
+        lang = name
     # Set the stanza tokenizer
     config["nlp"]["tokenizer"]["@tokenizers"] = "spacy_stanza.PipelineAsTokenizer.v1"
-    # Set the stanza lang if not provided
-    if "lang" not in config["nlp"]["tokenizer"]:
-        config["nlp"]["tokenizer"]["lang"] = name
+    # Set the stanza options
+    config["nlp"]["tokenizer"]["lang"] = lang
+    config["nlp"]["tokenizer"]["dir"] = dir
+    config["nlp"]["tokenizer"]["package"] = package
+    config["nlp"]["tokenizer"]["processors"] = processors
+    config["nlp"]["tokenizer"]["logging_level"] = logging_level
+    config["nlp"]["tokenizer"]["verbose"] = verbose
+    config["nlp"]["tokenizer"]["use_gpu"] = use_gpu
     config["nlp"]["tokenizer"]["kwargs"].update(kwargs)
-    return spacy_blank(name, vocab=vocab, config=config, meta=meta)
+    return blank(name, config=config)

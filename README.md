@@ -57,7 +57,7 @@ models](https://stanfordnlp.github.io/stanza/models.html).
 > v2.x](https://v2.spacy.io) worked considerably differently. Please see
 > previous tagged versions of this README for documentation on prior versions.
 
-Use `spacy_stanza.blank()` to create an `nlp` object that you can use to
+Use `spacy_stanza.load_pipeline()` to create an `nlp` object that you can use to
 process a text with a Stanza pipeline and create a spaCy [`Doc`
 object](https://spacy.io/api/doc). By default, both the spaCy pipeline and the
 Stanza pipeline will be initialized with the same `lang`, e.g. "en":
@@ -70,7 +70,7 @@ import spacy_stanza
 stanza.download("en")
 
 # Initialize the pipeline
-nlp = spacy_stanza.blank("en")
+nlp = spacy_stanza.load_pipeline("en")
 
 doc = nlp("Barack Obama was born in Hawaii. He was elected president in 2008.")
 for token in doc:
@@ -117,47 +117,40 @@ np_array = doc.to_array(['ORTH', 'LEMMA', 'POS'])
 ### Stanza Pipeline options
 
 Additional options for the Stanza
-[`Pipeline`](https://stanfordnlp.github.io/stanza/pipeline.html#pipeline) can
-be provided in the `config` passed to `spacy_stanza.blank()`, which has the
-same API as [`spacy.blank()`](https://spacy.io/api/top-level#spacy.blank):
+[`Pipeline`](https://stanfordnlp.github.io/stanza/pipeline.html#pipeline) can be
+provided as keyword arguments following the `Pipeline` API:
 
-- Provide the Stanza language as `nlp.tokenizer.lang`. For Stanza languages
-  without spaCy support, use "xx" for the spaCy language setting:
+- Provide the Stanza language as `lang`. For Stanza languages without spaCy
+  support, use "xx" for the spaCy language setting:
 
   ```python
   # Initialize a pipeline for Coptic
-  nlp = spacy_stanza.blank(
-      "xx", config={"nlp": {"tokenizer": {"lang": "cop"}}}
-  )
+  nlp = spacy_stanza.load_pipeline("xx", lang="cop")
   ```
 
-- Provide the Stanza pipeline package as `nlp.tokenizer.package`:
+- Provide Stanza pipeline settings following the `Pipeline` API:
 
   ```python
   # Initialize a German pipeline with the `hdt` package
-  nlp = spacy_stanza.blank(
-      "de", config={"nlp": {"tokenizer": {"package": "hdt"}}}
-  )
+  nlp = spacy_stanza.load_pipeline("de", package="hdt")
   ```
 
-- Tokenize with spaCy rather than the statistical tokenizer (only for English)
+- Tokenize with spaCy rather than the statistical tokenizer (only for English):
 
   ```python
-  nlp = spacy_stanza.blank(
-      "en", config={"nlp": {"tokenizer": {"processors": {"tokenize": "spacy"}}}}
-  )
+  nlp = spacy_stanza.load_pipeline("en", processors= {"tokenize": "spacy"})
   ```
 
-- Provide any additional settings as keyword arguments (or alternately directly in the config under `nlp.tokenizer.kwargs`):
+- Provide any additional processor settings as additional keyword arguments:
 
   ```python
   # Provide pretokenized texts (whitespace tokenization)
-  nlp = spacy_stanza.blank("de", tokenize_pretokenized=True)
+  nlp = spacy_stanza.load_pipeline("de", tokenize_pretokenized=True)
   ```
 
-The config specifies all `Pipeline` options in the `[nlp.tokenizer]` block. For
-example, the config for the last example above, an English pipeline with
-pretokenized texts:
+The spaCy config specifies all `Pipeline` options in the `[nlp.tokenizer]`
+block. For example, the config for the last example above, a German pipeline
+with pretokenized texts:
 
 ```ini
 [nlp.tokenizer]
@@ -198,11 +191,12 @@ the default model directory or in the path specified under
 ### Adding additional spaCy pipeline components
 
 By default, the spaCy pipeline in the `nlp` object returned by
-`spacy_stanza.blank()` will be empty, because all `stanza` attributes are
-computed and set within the custom tokenizer,
+`spacy_stanza.load_pipeline()` will be empty, because all `stanza` attributes
+are computed and set within the custom tokenizer,
 [`StanzaTokenizer`](spacy_stanza/tokenizer.py). But since it's a regular `nlp`
 object, you can add your own components to the pipeline. For example, you could
 add [your own custom text classification
-component](https://spacy.io/usage/training) with `nlp.add_pipe("textcat", source=source_nlp)`, or augment the named entities with your own rule-based
+component](https://spacy.io/usage/training) with `nlp.add_pipe("textcat",
+source=source_nlp)`, or augment the named entities with your own rule-based
 patterns using the [`EntityRuler`
 component](https://spacy.io/usage/rule-based-matching#entityruler).

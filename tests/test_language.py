@@ -13,7 +13,7 @@ def tags_equal(act, exp):
 def test_spacy_stanza_english():
     lang = "en"
     stanza.download(lang)
-    nlp = spacy_stanza.blank(lang)
+    nlp = spacy_stanza.load_pipeline(lang)
     assert nlp.Defaults == EnglishDefaults
 
     doc = nlp("Hello world! This is a test.")
@@ -92,14 +92,14 @@ def test_spacy_stanza_english():
     assert doc.ents[1].label_ == "GPE"
 
     # Test serialization
-    reloaded_nlp = spacy_stanza.blank(lang).from_bytes(nlp.to_bytes())
+    reloaded_nlp = spacy_stanza.load_pipeline(lang).from_bytes(nlp.to_bytes())
     assert reloaded_nlp.config.to_str() == nlp.config.to_str()
 
 
 def test_spacy_stanza_german():
     lang = "de"
     stanza.download(lang)
-    nlp = spacy_stanza.blank(lang)
+    nlp = spacy_stanza.load_pipeline(lang)
     assert nlp.Defaults == GermanDefaults
 
     # warning for misaligned ents due to multi-word token expansion
@@ -111,9 +111,7 @@ def test_spacy_stanza_tokenizer_options():
     # whitespace tokens from spacy tokenizer are handled correctly
     lang = "en"
     stanza.download(lang)
-    nlp = spacy_stanza.blank(
-        lang, config={"nlp": {"tokenizer": {"processors": {"tokenize": "spacy"}}}}
-    )
+    nlp = spacy_stanza.load_pipeline(lang, processors={"tokenize": "spacy"})
 
     doc = nlp(" Barack  Obama  was  born\n\nin Hawaii.")
     assert [t.text for t in doc] == [
@@ -132,7 +130,7 @@ def test_spacy_stanza_tokenizer_options():
     ]
 
     # pretokenized text is handled correctly
-    nlp = spacy_stanza.blank(lang, tokenize_pretokenized=True)
+    nlp = spacy_stanza.load_pipeline(lang, tokenize_pretokenized=True)
     doc = nlp("Barack Obama was born in Hawaii.\nBarack Obama was born in Hawaii.")
     assert [t.text for t in doc] == [
         "Barack",
