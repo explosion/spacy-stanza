@@ -132,9 +132,7 @@ def test_spacy_stanza_tokenizer_options():
     ]
 
     # pretokenized text is handled correctly
-    nlp = spacy_stanza.blank(
-        lang, config={"nlp": {"tokenizer": {"kwargs": {"tokenize_pretokenized": True}}}}
-    )
+    nlp = spacy_stanza.blank(lang, tokenize_pretokenized=True)
     doc = nlp("Barack Obama was born in Hawaii.\nBarack Obama was born in Hawaii.")
     assert [t.text for t in doc] == [
         "Barack",

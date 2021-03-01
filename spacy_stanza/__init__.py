@@ -10,7 +10,8 @@ def blank(
     *,
     vocab: Union[Vocab, bool] = True,
     config: Union[Dict[str, Any], Config] = util.SimpleFrozenDict(),
-    meta: Dict[str, Any] = util.SimpleFrozenDict()
+    meta: Dict[str, Any] = util.SimpleFrozenDict(),
+    **kwargs,
 ) -> Language:
     """Create a blank nlp object for a given language code with a stanza
     pipeline as part of the tokenizer. To use the default stanza pipeline with
@@ -21,6 +22,7 @@ def blank(
     vocab (Vocab): A Vocab object. If True, a vocab is created.
     config (Dict[str, Any] / Config): Optional config overrides.
     meta (Dict[str, Any]): Overrides for nlp.meta.
+    **kwargs: Options for the individual stanza processors.
     RETURNS (Language): The nlp object.
     """
     # We should accept both dot notation and nested dict here for consistency
@@ -29,9 +31,12 @@ def blank(
         config["nlp"] = {}
     if "tokenizer" not in config["nlp"]:
         config["nlp"]["tokenizer"] = {}
+    if "kwargs" not in config["nlp"]["tokenizer"]:
+        config["nlp"]["tokenizer"]["kwargs"] = {}
     # Set the stanza tokenizer
     config["nlp"]["tokenizer"]["@tokenizers"] = "spacy_stanza.PipelineAsTokenizer.v1"
     # Set the stanza lang if not provided
     if "lang" not in config["nlp"]["tokenizer"]:
         config["nlp"]["tokenizer"]["lang"] = name
+    config["nlp"]["tokenizer"]["kwargs"].update(kwargs)
     return spacy_blank(name, vocab=vocab, config=config, meta=meta)

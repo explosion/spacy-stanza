@@ -148,13 +148,11 @@ same API as [`spacy.blank()`](https://spacy.io/api/top-level#spacy.blank):
   )
   ```
 
-- Provide any additional settings under `nlp.tokenizer.kwargs`:
+- Provide any additional settings as keyword arguments (or alternately directly in the config under `nlp.tokenizer.kwargs`):
 
   ```python
   # Provide pretokenized texts (whitespace tokenization)
-  nlp = spacy_stanza.blank(
-      "de", config={"nlp": {"tokenizer": {"kwargs": {"tokenize_pretokenized": True}}}}
-  )
+  nlp = spacy_stanza.blank("de", tokenize_pretokenized=True)
   ```
 
 The config specifies all `Pipeline` options in the `[nlp.tokenizer]` block. For
