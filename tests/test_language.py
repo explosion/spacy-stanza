@@ -1,4 +1,4 @@
-from spacy.lang.en import EnglishDefaults
+from spacy.lang.en import EnglishDefaults, English
 from spacy.lang.de import GermanDefaults
 import spacy_stanza
 import stanza
@@ -167,3 +167,17 @@ def test_spacy_stanza_tokenizer_options():
         "in",
         "Hawaii.",
     ]
+
+
+def test_spacy_stanza_from_config():
+    config = {
+        "nlp": {
+            "tokenizer": {
+                "@tokenizers": "spacy_stanza.PipelineAsTokenizer.v1",
+                "lang": "en",
+            }
+        }
+    }
+    nlp = English.from_config(config)
+    assert nlp.Defaults == EnglishDefaults
+    assert type(nlp.tokenizer) == spacy_stanza.tokenizer.StanzaTokenizer
