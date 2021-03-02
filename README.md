@@ -31,7 +31,7 @@ your pretrained `stanza` model:
 
 ## ️️️⌛️ Installation
 
-As of v0.3.0 `spacy-stanza` is only compatible with **spaCy v3.x**. To install
+As of v1.0.0 `spacy-stanza` is only compatible with **spaCy v3.x**. To install
 the most recent version:
 
 ```bash
