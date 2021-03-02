@@ -55,7 +55,7 @@ def test_spacy_stanza_english():
     assert doc.ents[1].label_ == "GPE"
 
     # Test whitespace alignment
-    doc = nlp(" Barack  Obama  was  born\n\nin Hawaii.")
+    doc = nlp(" Barack  Obama  was  born\n\nin Hawaii.\n")
     assert [t.pos_ for t in doc] == [
         "SPACE",
         "PROPN",
@@ -69,6 +69,7 @@ def test_spacy_stanza_english():
         "ADP",
         "PROPN",
         "PUNCT",
+        "SPACE",
     ]
     assert [t.dep_ for t in doc] == [
         "",
@@ -83,13 +84,23 @@ def test_spacy_stanza_english():
         "case",
         "root",
         "punct",
+        "",
     ]
-    assert [t.head.i for t in doc] == [0, 7, 2, 1, 4, 7, 6, 7, 8, 10, 10, 10]
+    assert [t.head.i for t in doc] == [0, 7, 2, 1, 4, 7, 6, 7, 8, 10, 10, 10, 12]
     assert len(doc.ents) == 2
     assert doc.ents[0].text == "Barack  Obama"
     assert doc.ents[0].label_ == "PERSON"
     assert doc.ents[1].text == "Hawaii"
     assert doc.ents[1].label_ == "GPE"
+
+    # Test trailing whitespace handling
+    doc = nlp("a ")
+    doc = nlp("a  ")
+    doc = nlp("a \n")
+    doc = nlp("\n ")
+    doc = nlp("\t  ")
+    doc = nlp("a\n ")
+    doc = nlp("a  \t  ")
 
     # Test serialization
     reloaded_nlp = spacy_stanza.load_pipeline(lang).from_bytes(nlp.to_bytes())

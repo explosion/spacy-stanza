@@ -108,7 +108,9 @@ class StanzaTokenizer(object):
             )
         offset = 0
         for i, word in enumerate(words):
-            if word.isspace() and word != snlp_tokens[i + offset].text:
+            if word.isspace() and (
+                i + offset >= len(snlp_tokens) or word != snlp_tokens[i + offset].text
+            ):
                 # insert a space token
                 pos.append("SPACE")
                 tags.append("_SP")
