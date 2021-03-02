@@ -34,7 +34,11 @@ def setup_package():
         packages=find_packages(),
         install_requires=["spacy>=3.0.0,<4.0.0", "stanza>=1.2.0,<1.3.0"],
         python_requires=">=3.6",
-        entry_points={"spacy_languages": ["stanza_en = spacy_stanza:StanzaLanguage"]},
+        entry_points={
+            "spacy_tokenizers": [
+                "spacy_stanza.PipelineAsTokenizer.v1 = spacy_stanza:tokenizer.create_tokenizer",
+            ]
+        },
         classifiers=[
             "Development Status :: 4 - Beta",
             "Intended Audience :: Developers",
@@ -42,6 +46,7 @@ def setup_package():
             "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
         ],
         zip_safe=False,
     )
