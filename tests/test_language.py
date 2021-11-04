@@ -1,5 +1,7 @@
 from spacy.lang.en import EnglishDefaults, English
 from spacy.lang.de import GermanDefaults
+from spacy.lang.es import SpanishDefaults
+
 import spacy_stanza
 import stanza
 import pytest
@@ -116,6 +118,19 @@ def test_spacy_stanza_german():
     # warning for misaligned ents due to multi-word token expansion
     with pytest.warns(UserWarning):
         doc = nlp("Auf dem Friedhof an der Straße Am Rosengarten")
+
+
+def test_spacy_stanza_spanish():
+    lang = "es"
+    stanza.download(lang)
+    nlp = spacy_stanza.load_pipeline(lang)
+    assert nlp.Defaults == SpanishDefaults
+
+    doc = nlp("No puedo creer lo aburrida que está esta clase.")
+
+    # The Spanish models do not have xpos (tag_) (token.xpos is None)
+    # As a fallback, tag_ should be the same as pos_
+    assert [t.pos_ for t in doc] == [t.tag_ for t in doc] == ['ADV', 'AUX', 'VERB', 'PRON', 'ADJ', 'PRON', 'VERB', 'DET', 'NOUN', 'PUNCT']
 
 
 def test_spacy_stanza_tokenizer_options():
