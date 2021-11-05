@@ -124,16 +124,26 @@ def test_spacy_stanza_spanish():
     lang = "es"
     stanza.download(lang)
     nlp = spacy_stanza.load_pipeline(lang)
+    snlp = nlp.tokenizer.snlp
     assert nlp.Defaults == SpanishDefaults
 
-    # Example from the training data so that labels are likely correct
+    # Example from the training data so that predicted labels are likely correct
     # https://github.com/UniversalDependencies/UD_Spanish-AnCora
-    doc = nlp("Las reservas en oro se valoran en base a 300 dólares estadounidenses por cada onza troy de oro.")
+    text = "Las reservas en oro se valoran en base a 300 dólares estadounidenses por cada onza troy de oro."
+    doc = nlp(text)
+    sdoc = snlp(text)
 
-    # The Spanish models do not have xpos (tag_) (token.xpos is None)
-    # As a fallback, tag_ should be the same as pos_
-    assert [t.pos_ for t in doc] == [t.tag_ for t in doc] == ["DET", "NOUN", "ADP", "NOUN", "PRON", "VERB", "ADP", "NOUN", "ADP", "NUM", "NOUN", "ADJ", "ADP", "DET", "NOUN", "NOUN", "ADP", "NOUN", "PUNCT"]
-
+    # In the training data (UD<v2.9), the xpos columns are empty, meaning that
+    # xpos = None in stanza. In this case, the pos (upos) should be copied to tag (xpos)
+    # UDv2.9 does have xpos tags. So to make sure this test runs successfully, only
+    # run it when we know that the original stanza xpos is None (UD<v2.9)
+    if all(w.xpos is None for sent in sdoc.sentences for w in sent.words):
+        assert [t.pos_ for t in doc] == [t.tag_ for t in doc] == ["DET", "NOUN", "ADP", "NOUN", "PRON", "VERB", "ADP",
+                                                                  "NOUN", "ADP", "NUM", "NOUN", "ADJ", "ADP", "DET",
+                                                                  "NOUN", "NOUN", "ADP", "NOUN", "PUNCT"]
+    else:
+        # TODO: update here when new models use UDv2.9 xpos labels
+        pass
 
 def test_spacy_stanza_tokenizer_options():
     # whitespace tokens from spacy tokenizer are handled correctly
@@ -205,3 +215,5 @@ def test_spacy_stanza_from_config():
     nlp = English.from_config(config)
     assert nlp.Defaults == EnglishDefaults
     assert type(nlp.tokenizer) == spacy_stanza.tokenizer.StanzaTokenizer
+
+# pytest tests -k spacy_stanza_spanish
