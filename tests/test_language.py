@@ -126,11 +126,13 @@ def test_spacy_stanza_spanish():
     nlp = spacy_stanza.load_pipeline(lang)
     assert nlp.Defaults == SpanishDefaults
 
-    doc = nlp("No puedo creer lo aburrida que está esta clase.")
+    # Example from the training data so that labels are likely correct
+    # https://github.com/UniversalDependencies/UD_Spanish-AnCora
+    doc = nlp("Las reservas en oro se valoran en base a 300 dólares estadounidenses por cada onza troy de oro.")
 
     # The Spanish models do not have xpos (tag_) (token.xpos is None)
     # As a fallback, tag_ should be the same as pos_
-    assert [t.pos_ for t in doc] == [t.tag_ for t in doc] == ['ADV', 'AUX', 'VERB', 'PRON', 'ADJ', 'PRON', 'VERB', 'DET', 'NOUN', 'PUNCT']
+    assert [t.pos_ for t in doc] == [t.tag_ for t in doc] == ["DET", "NOUN", "ADP", "NOUN", "PRON", "VERB", "ADP", "NOUN", "ADP", "NUM", "NOUN", "ADJ", "ADP", "DET", "NOUN", "NOUN", "ADP", "NOUN", "PUNCT"]
 
 
 def test_spacy_stanza_tokenizer_options():
