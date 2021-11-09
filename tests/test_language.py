@@ -138,12 +138,35 @@ def test_spacy_stanza_spanish():
     # UDv2.9 does have xpos tags. So to make sure this test runs successfully, only
     # run it when we know that the original stanza xpos is None (UD<v2.9)
     if all(w.xpos is None for sent in sdoc.sentences for w in sent.words):
-        assert [t.pos_ for t in doc] == [t.tag_ for t in doc] == ["DET", "NOUN", "ADP", "NOUN", "PRON", "VERB", "ADP",
-                                                                  "NOUN", "ADP", "NUM", "NOUN", "ADJ", "ADP", "DET",
-                                                                  "NOUN", "NOUN", "ADP", "NOUN", "PUNCT"]
+        assert (
+            [t.pos_ for t in doc]
+            == [t.tag_ for t in doc]
+            == [
+                "DET",
+                "NOUN",
+                "ADP",
+                "NOUN",
+                "PRON",
+                "VERB",
+                "ADP",
+                "NOUN",
+                "ADP",
+                "NUM",
+                "NOUN",
+                "ADJ",
+                "ADP",
+                "DET",
+                "NOUN",
+                "NOUN",
+                "ADP",
+                "NOUN",
+                "PUNCT",
+            ]
+        )
     else:
         # TODO: update here when new models use UDv2.9 xpos labels
         pass
+
 
 def test_spacy_stanza_tokenizer_options():
     # whitespace tokens from spacy tokenizer are handled correctly
