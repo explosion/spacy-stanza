@@ -143,7 +143,7 @@ class StanzaTokenizer(object):
                 assert word == token.text
 
                 pos.append(token.upos or "")
-                tags.append(token.xpos or token.feats or "")
+                tags.append(token.xpos or token.upos or "")
                 morphs.append(token.feats or "")
                 deps.append(token.deprel or "")
                 heads.append(snlp_heads[i + offset])
