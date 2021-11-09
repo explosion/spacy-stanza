@@ -215,5 +215,3 @@ def test_spacy_stanza_from_config():
     nlp = English.from_config(config)
     assert nlp.Defaults == EnglishDefaults
     assert type(nlp.tokenizer) == spacy_stanza.tokenizer.StanzaTokenizer
-
-# pytest tests -k spacy_stanza_spanish
