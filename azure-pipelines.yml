@@ -22,7 +22,7 @@ jobs:
       #   python.version: '3.6'
 
       Python36Mac:
-        imageName: 'macos-10.14'
+        imageName: 'macos-10.15'
         python.version: '3.6'
     maxParallel: 4
   pool:
