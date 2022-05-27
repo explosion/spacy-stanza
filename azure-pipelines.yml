@@ -21,9 +21,9 @@ jobs:
       #   imageName: 'vs2017-win2016'
       #   python.version: '3.6'
 
-      Python36Mac:
-        imageName: 'macos-10.15'
-        python.version: '3.6'
+      Python37Mac:
+        imageName: 'macos-latest'
+        python.version: '3.7'
     maxParallel: 4
   pool:
     vmImage: $(imageName)
