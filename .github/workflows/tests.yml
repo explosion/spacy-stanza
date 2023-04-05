@@ -2,13 +2,22 @@ name: tests
 
 on:
   push:
+    paths-ignore:
+      - "*.md"
   pull_request:
     types: [opened, synchronize, reopened, edited]
+    paths-ignore:
+      - "*.md"
+
+env:
+  MODULE_NAME: 'spacy_stanza'
+  RUN_MYPY: 'false'
 
 jobs:
   tests:
     name: Test
-    runs-on: macos-latest
+    if: github.repository_owner == 'explosion'
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repo
@@ -26,9 +35,16 @@ jobs:
           python -m pip install -U -r requirements.txt
           python -m build --sdist
 
-      - name: Delete source directory
-        run: rm -rf spacy_stanza
+      - name: Run mypy
         shell: bash
+        if: ${{ env.RUN_MYPY == 'true' }}
+        run: |
+          python -m mypy $MODULE_NAME
+
+      - name: Delete source directory
+        shell: bash
+        run: |
+          rm -rf $MODULE_NAME
 
       - name: Uninstall all packages
         run: |
@@ -36,16 +52,21 @@ jobs:
           python -m pip uninstall -y -r installed.txt
 
       - name: Install from sdist
+        shell: bash
         run: |
           SDIST=$(python -c "import os;print(os.listdir('./dist')[-1])" 2>&1)
           python -m pip install dist/$SDIST
-        shell: bash
 
       - name: Test import
-        run: python -c "import spacy_stanza"
+        shell: bash
+        run: |
+          python -c "import $MODULE_NAME" -Werror
 
       - name: Install test requirements
-        run: python -m pip install -U -r requirements.txt
+        run: |
+          python -m pip install -U -r requirements.txt
 
       - name: Run tests
-        run: python -m pytest tests
+        shell: bash
+        run: |
+          python -m pytest tests -Werror
