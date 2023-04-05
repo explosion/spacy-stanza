@@ -69,4 +69,4 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          python -m pytest --pyargs $MODULE_NAME -Werror
+          python -m pytest tests -Werror
