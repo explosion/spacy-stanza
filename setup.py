@@ -50,6 +50,10 @@ def setup_package():
             "Programming Language :: Python :: 3.10",
         ],
         zip_safe=False,
+        project_urls={
+            "Release notes": "https://github.com/explosion/spacy-stanza/releases",
+            "Source": "https://github.com/explosion/spacy-stanza",
+        },
     )
 
 
