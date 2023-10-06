@@ -32,7 +32,7 @@ def setup_package():
         version=about["__version__"],
         license=about["__license__"],
         packages=find_packages(),
-        install_requires=["spacy>=3.0.0,<4.0.0", "stanza>=1.2.0,<1.6.0"],
+        install_requires=["spacy>=3.0.0,<4.0.0", "stanza>=1.2.0,<1.7.0"],
         python_requires=">=3.6",
         entry_points={
             "spacy_tokenizers": [
@@ -48,6 +48,7 @@ def setup_package():
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
         ],
         zip_safe=False,
     )
