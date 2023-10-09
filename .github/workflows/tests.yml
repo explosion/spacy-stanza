@@ -17,7 +17,13 @@ jobs:
   tests:
     name: Test
     if: github.repository_owner == 'explosion'
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ubuntu-latest
+        python_version: ["3.7", "3.11"]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Check out repo
@@ -26,7 +32,7 @@ jobs:
       - name: Configure Python version
         uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python_version }}
           architecture: x64
 
       - name: Build sdist
