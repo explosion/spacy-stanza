@@ -15,12 +15,17 @@ def create_tokenizer(
     lang: str = "",
     dir: Optional[str] = None,
     package: str = "default",
-    processors: Union[dict, str] = {},
+    processors: Union[dict, str] = None,
     logging_level: Optional[Union[int, str]] = None,
     verbose: Optional[bool] = None,
     use_gpu: bool = True,
-    kwargs: dict = {},
+    kwargs: dict = None,
 ):
+    if processors is None:
+        processors = {}
+    if kwargs is None:
+        kwargs = {}
+
     def tokenizer_factory(
         nlp,
         lang=lang,
@@ -82,16 +87,14 @@ class StanzaTokenizer(object):
 
         snlp_doc = self.snlp(text)
         text = snlp_doc.text
-        snlp_tokens, snlp_heads = self.get_tokens_with_heads(snlp_doc)
-        words = []
-        spaces = []
+        snlp_tokens, snlp_heads, snlp_sent_starts = self.get_tokens_with_heads(snlp_doc)
         pos = []
         tags = []
         morphs = []
         deps = []
         heads = []
         lemmas = []
-        offset = 0
+        sent_starts = []
         token_texts = [t.text for t in snlp_tokens]
         is_aligned = True
         try:
@@ -117,6 +120,7 @@ class StanzaTokenizer(object):
                 morphs.append("")
                 deps.append("")
                 lemmas.append(word)
+                sent_starts.append(False)
 
                 # increment any heads left of this position that point beyond
                 # this position to the right (already present in heads)
@@ -141,7 +145,7 @@ class StanzaTokenizer(object):
             else:
                 token = snlp_tokens[i + offset]
                 assert word == token.text
-
+                sent_starts.append(snlp_sent_starts[i + offset])
                 pos.append(token.upos or "")
                 tags.append(token.xpos or token.upos or "")
                 morphs.append(token.feats or "")
@@ -158,6 +162,7 @@ class StanzaTokenizer(object):
             morphs=morphs,
             lemmas=lemmas,
             deps=deps,
+            sent_starts=sent_starts,
             heads=[head + i for i, head in enumerate(heads)],
         )
         ents = []
@@ -199,8 +204,11 @@ class StanzaTokenizer(object):
         """
         tokens = []
         heads = []
+        sent_starts = []
         offset = 0
+        token_idx = 0
         for sentence in snlp_doc.sentences:
+            first = True
             for token in sentence.tokens:
                 for word in token.words:
                     # Here, we're calculating the absolute token index in the doc,
@@ -212,8 +220,31 @@ class StanzaTokenizer(object):
                         head = 0
                     heads.append(head)
                     tokens.append(word)
+                    if first:
+                        sent_starts.append(True)
+                        first = False
+                    else:
+                        sent_starts.append(False)
+                    token_idx += 1
             offset += sum(len(token.words) for token in sentence.tokens)
-        return tokens, heads
+        return tokens, heads, sent_starts
+
+    @staticmethod
+    def get_sentences(snlp_doc):
+        """Extract the sentences from the Stanza Doc.
+
+        snlp_doc (stanza.Document): The processed Stanza doc.
+        RETURNS (list): The sentences.
+        """
+        sentences = []
+        offset = 0
+        for sentence in snlp_doc.sentences:
+            words = []
+            for token in sentence.tokens:
+                words.extend([word.text for word in token.words])
+            sentences.append("".join(words))
+            offset += len(words)
+        return sentences
 
     def get_words_and_spaces(self, words, text):
         if "".join("".join(words).split()) != "".join(text.split()):
@@ -242,7 +273,7 @@ class StanzaTokenizer(object):
         if text_pos < len(text):
             text_words.append(text[text_pos:])
             text_spaces.append(False)
-        return (text_words, text_spaces)
+        return text_words, text_spaces
 
     def token_vector(self, token):
         """Get Stanza's pretrained word embedding for given token.

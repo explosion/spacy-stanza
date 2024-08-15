@@ -10,7 +10,7 @@ def load_pipeline(
     lang: str = "",
     dir: Optional[str] = None,
     package: str = "default",
-    processors: Union[dict, str] = {},
+    processors: Union[dict, str] = None,
     logging_level: Optional[Union[int, str]] = None,
     verbose: Optional[bool] = None,
     use_gpu: bool = True,
@@ -32,6 +32,8 @@ def load_pipeline(
     **kwargs: Options for the individual stanza processors.
     RETURNS (Language): The nlp object.
     """
+    if processors is None:
+        processors = {}
     # Create an empty config skeleton
     config = {"nlp": {"tokenizer": {"kwargs": {}}}}
     if lang == "":
